@@ -22,10 +22,11 @@ builder.Services.AddFastEndpoints()
         };
     });
 
-// Configure HTTPS redirection to use port 5001
+// Configure HTTPS redirection
 builder.Services.AddHttpsRedirection(options =>
 {
     options.HttpsPort = 5001;
+    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
 });
 
 // Configure forwarded headers
@@ -53,6 +54,7 @@ var app = builder.Build();
 // Enable forwarded headers
 app.UseForwardedHeaders();
 
+// Always use HTTPS redirection
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
