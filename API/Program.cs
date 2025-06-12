@@ -7,6 +7,7 @@ using Core.Interfaces;
 using Infrastructure.Data.Repository;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.HttpOverrides;
+using API.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +22,13 @@ builder.Services.AddFastEndpoints()
             s.Version = "v1";
         };
     });
-
+builder.Services.AddSwaggerGen(options =>
+{
+    options.EnableAnnotations();
+    options.OperationFilter<ResponseExampleSwaggerOperationFilter>();
+    options.SchemaFilter<PascalCaseEnumSchemaFilter>();
+    options.SupportNonNullableReferenceTypes();
+});
 // Configure HTTPS redirection
 builder.Services.AddHttpsRedirection(options =>
 {
