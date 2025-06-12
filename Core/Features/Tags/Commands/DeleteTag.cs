@@ -1,12 +1,13 @@
 using Core.Domain;
 using Core.Interfaces;
 using MediatR;
+using ErrorOr;
 
 namespace Core.Features.Tags.Commands;
 
-public record DeleteTagCommand(int Id) : IRequest<Unit>;
+public record DeleteTagCommand(int Id) : IRequest<ErrorOr<Success>>;
 
-public class DeleteTagHandler : IRequestHandler<DeleteTagCommand, Unit>
+public class DeleteTagHandler : IRequestHandler<DeleteTagCommand, ErrorOr<Success>>
 {
   private readonly IGenericRepository<Tag> _tagRepository;
 
@@ -15,14 +16,15 @@ public class DeleteTagHandler : IRequestHandler<DeleteTagCommand, Unit>
     _tagRepository = tagRepository;
   }
 
-  public async Task<Unit> Handle(DeleteTagCommand request, CancellationToken cancellationToken)
+  public async Task<ErrorOr<Success>> Handle(DeleteTagCommand request, CancellationToken cancellationToken)
   {
-    var tag = await _tagRepository.GetByIdAsync(request.Id, cancellationToken)
-        ?? throw new NotFoundException($"Tag with ID {request.Id} not found");
+    var tag = await _tagRepository.GetByIdAsync(request.Id, cancellationToken);
+    if (tag is null)
+      return TagErrors.NotFound(request.Id);
 
     _tagRepository.Delete(tag);
     await _tagRepository.SaveChangesAsync(cancellationToken);
 
-    return Unit.Value;
+    return Result.Success;
   }
 }

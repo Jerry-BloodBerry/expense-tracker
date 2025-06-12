@@ -36,7 +36,13 @@ public class UpdateTagEndpoint : Endpoint<UpdateTagRequest, SingleResponse<TagRe
       Name = req.Name
     };
 
-    await _mediator.Send(command, ct);
+    var result = await _mediator.Send(command, ct);
+
+    if (result.IsError)
+    {
+      await ProblemResult.Of(result.Errors, HttpContext).ExecuteAsync(HttpContext);
+      return;
+    }
 
     var response = new TagResponse
     {

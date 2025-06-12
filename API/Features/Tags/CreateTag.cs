@@ -2,6 +2,8 @@ using Core.Features.Tags.Commands;
 using FastEndpoints;
 using MediatR;
 using API.Utils.Response;
+using ErrorOr;
+using Microsoft.AspNetCore.Http;
 
 namespace API.Features.Tags;
 
@@ -29,12 +31,19 @@ public class CreateTagEndpoint : Endpoint<CreateTagRequest, SingleResponse<TagRe
   public override async Task HandleAsync(CreateTagRequest req, CancellationToken ct)
   {
     var command = new CreateTagCommand { Name = req.Name };
-    var id = await _mediator.Send(command, ct);
+    var result = await _mediator.Send(command, ct);
+
+    if (result.IsError)
+    {
+      await ProblemResult.Of(result.Errors, HttpContext).ExecuteAsync(HttpContext);
+      return;
+    }
+    var tag = result.Value;
 
     var response = new TagResponse
     {
-      Id = id,
-      Name = req.Name
+      Id = tag.Id,
+      Name = tag.Name
     };
 
     await SendCreatedAtAsync<GetTagEndpoint>(

@@ -2,6 +2,7 @@ using Core.Features.Tags.Queries;
 using FastEndpoints;
 using MediatR;
 using API.Utils.Response;
+using ErrorOr;
 
 namespace API.Features.Tags;
 
@@ -36,12 +37,32 @@ public class GetTagEndpoint : Endpoint<GetTagRequest, SingleResponse<TagResponse
     var query = new GetTagQuery(req.Id);
     var result = await _mediator.Send(query, ct);
 
+    if (result.IsError)
+    {
+      await ProblemResult.Of(result.Errors, HttpContext).ExecuteAsync(HttpContext);
+      return;
+    }
+
     var response = new TagResponse
     {
-      Id = result.Id,
-      Name = result.Name
+      Id = result.Value.Id,
+      Name = result.Value.Name
     };
 
     await SendOkAsync(SingleResponse.Of(response), ct);
+  }
+}
+
+public static class ErrorExtensions
+{
+  public static int StatusCode(this ErrorOr.Error error)
+  {
+    return error.Type switch
+    {
+      ErrorType.NotFound => StatusCodes.Status404NotFound,
+      ErrorType.Validation => StatusCodes.Status400BadRequest,
+      ErrorType.Conflict => StatusCodes.Status409Conflict,
+      _ => StatusCodes.Status500InternalServerError
+    };
   }
 }

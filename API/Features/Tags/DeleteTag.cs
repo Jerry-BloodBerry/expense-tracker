@@ -1,6 +1,7 @@
 using Core.Features.Tags.Commands;
 using FastEndpoints;
 using MediatR;
+using API.Utils.Response;
 
 namespace API.Features.Tags;
 
@@ -33,7 +34,14 @@ public class DeleteTagEndpoint : Endpoint<DeleteTagRequest>
   public override async Task HandleAsync(DeleteTagRequest req, CancellationToken ct)
   {
     var command = new DeleteTagCommand(req.Id);
-    await _mediator.Send(command, ct);
+    var result = await _mediator.Send(command, ct);
+
+    if (result.IsError)
+    {
+      await ProblemResult.Of(result.Errors, HttpContext).ExecuteAsync(HttpContext);
+      return;
+    }
+
     await SendNoContentAsync(ct);
   }
 }

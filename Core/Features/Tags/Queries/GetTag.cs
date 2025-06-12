@@ -1,12 +1,13 @@
 using Core.Domain;
 using Core.Interfaces;
 using MediatR;
+using ErrorOr;
 
 namespace Core.Features.Tags.Queries;
 
-public record GetTagQuery(int Id) : IRequest<TagDto>;
+public record GetTagQuery(int Id) : IRequest<ErrorOr<TagDto>>;
 
-public class GetTagHandler : IRequestHandler<GetTagQuery, TagDto>
+public class GetTagHandler : IRequestHandler<GetTagQuery, ErrorOr<TagDto>>
 {
   private readonly IGenericRepository<Tag> _tagRepository;
 
@@ -15,10 +16,11 @@ public class GetTagHandler : IRequestHandler<GetTagQuery, TagDto>
     _tagRepository = tagRepository;
   }
 
-  public async Task<TagDto> Handle(GetTagQuery request, CancellationToken cancellationToken)
+  public async Task<ErrorOr<TagDto>> Handle(GetTagQuery request, CancellationToken cancellationToken)
   {
-    var tag = await _tagRepository.GetByIdAsync(request.Id, cancellationToken)
-        ?? throw new NotFoundException($"Tag with ID {request.Id} not found");
+    var tag = await _tagRepository.GetByIdAsync(request.Id, cancellationToken);
+    if (tag is null)
+      return TagErrors.NotFound(request.Id);
 
     return new TagDto
     {
