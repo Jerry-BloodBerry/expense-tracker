@@ -39,28 +39,22 @@ public class GetExpenseEndpoint : Endpoint<GetExpenseRequest, ExpenseResponse>
       return;
     }
 
-    var response = new ExpenseResponse
-    {
-      Id = expense.Id,
-      Name = expense.Name,
-      Amount = expense.Amount,
-      Date = expense.Date,
-      Description = expense.Description,
-      Currency = expense.Currency,
-      IsRecurring = expense.IsRecurring,
-      RecurrenceInterval = expense.RecurrenceInterval,
-      Category = new CategoryResponse
-      {
-        Id = expense.Category.Id,
-        Name = expense.Category.Name,
-        Description = expense.Category.Description
-      },
-      Tags = expense.Tags.Select(t => new TagResponse
-      {
-        Id = t.Id,
-        Name = t.Name
-      }).ToList()
-    };
+    var response = new ExpenseResponse(
+      Id: expense.Id,
+      Name: expense.Name,
+      Amount: expense.Amount,
+      Date: expense.Date,
+      Description: expense.Description,
+      Currency: expense.Currency,
+      IsRecurring: expense.IsRecurring,
+      RecurrenceInterval: expense.RecurrenceInterval?.ToString(),
+      Category: new CategoryResponse(
+        Id: expense.Category.Id,
+        Name: expense.Category.Name,
+        Description: expense.Category.Description
+      ),
+      Tags: expense.Tags.Select(t => new TagResponse(Id: t.Id, Name: t.Name)).ToList()
+    );
 
     await SendOkAsync(response, ct);
   }

@@ -3,14 +3,14 @@ using Core.Features.Expenses.Specifications;
 using Core.Interfaces;
 using MediatR;
 
-namespace Features.Expenses.Queries;
+namespace Core.Features.Expenses.Queries;
 
 public class GetExpensesQuery : IRequest<ExpensesResult>
 {
   public DateTime? StartDate { get; init; }
   public DateTime? EndDate { get; init; }
   public int? CategoryId { get; init; }
-  public List<int> TagIds { get; init; } = new();
+  public List<int> TagIds { get; init; } = [];
   public decimal? MinAmount { get; init; }
   public decimal? MaxAmount { get; init; }
   public bool? IsRecurring { get; init; }
@@ -20,7 +20,7 @@ public class GetExpensesQuery : IRequest<ExpensesResult>
 
 public class ExpensesResult
 {
-  public List<ExpenseDto> Items { get; set; } = new();
+  public List<ExpenseDto> Items { get; set; } = [];
   public int TotalCount { get; set; }
   public int Page { get; set; }
   public int PageSize { get; set; }
@@ -38,9 +38,6 @@ public class GetExpensesHandler : IRequestHandler<GetExpensesQuery, ExpensesResu
 
   public async Task<ExpensesResult> Handle(GetExpensesQuery request, CancellationToken cancellationToken)
   {
-
-
-
     var getSpec = new GetAllExpensesSpecification(request);
     var expenses = await _expenseRepository.ListAsync(getSpec, cancellationToken);
     var totalCount = await _expenseRepository.CountAsync(getSpec, cancellationToken);

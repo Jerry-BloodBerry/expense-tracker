@@ -7,7 +7,7 @@ namespace Core.Features.Categories.Commands;
 
 public record CreateCategoryCommand : IRequest<ErrorOr<CategoryDto>>
 {
-  public string Name { get; init; }
+  public required string Name { get; init; }
   public string? Description { get; init; }
 }
 

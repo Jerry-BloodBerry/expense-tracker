@@ -8,15 +8,15 @@ namespace Core.Features.Expenses.Commands;
 public record UpdateExpenseCommand : IRequest<Unit>
 {
   public int Id { get; init; }
-  public string Name { get; init; }
+  public required string Name { get; init; }
   public int CategoryId { get; init; }
   public decimal Amount { get; init; }
   public DateTime Date { get; init; }
-  public string Description { get; init; }
-  public string Currency { get; init; }
+  public string? Description { get; init; }
+  public required string Currency { get; init; }
   public bool IsRecurring { get; init; }
   public RecurrenceInterval? RecurrenceInterval { get; init; }
-  public List<int> TagIds { get; init; } = new();
+  public List<int> TagIds { get; init; } = [];
 }
 
 public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, Unit>
@@ -56,27 +56,8 @@ public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, Unit>
       expense.RemoveRecurrence();
     }
 
-    // Update tags
-    var currentTags = expense.Tags.ToList();
     var newTags = await _tagRepository.ListAsync(new TagsWithIdsSpecification(request.TagIds), cancellationToken);
-
-    // Remove tags that are no longer present
-    foreach (var tag in currentTags)
-    {
-      if (!request.TagIds.Contains(tag.Id))
-      {
-        expense.RemoveTag(tag);
-      }
-    }
-
-    // Add new tags
-    foreach (var tag in newTags)
-    {
-      if (!currentTags.Any(t => t.Id == tag.Id))
-      {
-        expense.AddTag(tag);
-      }
-    }
+    expense.UpdateTags(newTags);
 
     await _expenseRepository.SaveChangesAsync(cancellationToken);
 

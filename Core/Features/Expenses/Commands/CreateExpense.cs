@@ -7,15 +7,15 @@ namespace Core.Features.Expenses.Commands;
 
 public record CreateExpenseCommand : IRequest<int>
 {
-  public string Name { get; init; }
+  public required string Name { get; init; }
   public int CategoryId { get; init; }
   public decimal Amount { get; init; }
   public DateTime Date { get; init; }
-  public string Description { get; init; }
-  public string Currency { get; init; }
+  public string? Description { get; init; }
+  public required string Currency { get; init; }
   public bool IsRecurring { get; init; }
   public RecurrenceInterval? RecurrenceInterval { get; init; }
-  public List<int> TagIds { get; init; } = new();
+  public List<int> TagIds { get; init; } = [];
 }
 
 public class CreateExpenseHandler : IRequestHandler<CreateExpenseCommand, int>
@@ -56,7 +56,7 @@ public class CreateExpenseHandler : IRequestHandler<CreateExpenseCommand, int>
       expense.SetAsRecurring(request.RecurrenceInterval.Value);
     }
 
-    if (request.TagIds.Any())
+    if (request.TagIds.Count != 0)
     {
       var tags = await _tagRepository.ListAsync(new TagsWithIdsSpecification(request.TagIds), cancellationToken);
       foreach (var tag in tags)

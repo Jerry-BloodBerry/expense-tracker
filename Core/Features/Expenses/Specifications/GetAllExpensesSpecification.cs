@@ -1,6 +1,6 @@
 using Core.Domain;
+using Core.Features.Expenses.Queries;
 using Core.Specifications;
-using Features.Expenses.Queries;
 
 namespace Core.Features.Expenses.Specifications;
 
@@ -14,7 +14,7 @@ public class GetAllExpensesSpecification : BaseSpecification<Expense>
           (!query.MinAmount.HasValue || e.Amount >= query.MinAmount) &&
           (!query.MaxAmount.HasValue || e.Amount <= query.MaxAmount) &&
           (!query.IsRecurring.HasValue || e.IsRecurring == query.IsRecurring) &&
-          (!query.TagIds.Any() || e.Tags.Any(t => query.TagIds.Contains(t.Id))))
+          (query.TagIds.Count == 0 || e.Tags.Any(t => query.TagIds.Contains(t.Id))))
   {
     AddOrderByDescending(e => e.Date);
     ApplyPaging((query.Page - 1) * query.PageSize, query.PageSize);

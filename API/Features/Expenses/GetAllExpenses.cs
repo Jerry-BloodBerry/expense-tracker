@@ -1,7 +1,6 @@
+using Core.Features.Expenses.Queries;
 using FastEndpoints;
 using MediatR;
-using ExpensesQuery = Features.Expenses.Queries.GetExpensesQuery;
-using ExpensesQueryResult = Features.Expenses.Queries.ExpensesResult;
 
 namespace API.Features.Expenses;
 
@@ -27,7 +26,7 @@ public record GetAllExpensesRequest
   public int PageSize { get; init; } = 10;
 }
 
-public class GetAllExpensesEndpoint : Endpoint<GetAllExpensesRequest, ExpensesQueryResult>
+public class GetAllExpensesEndpoint : Endpoint<GetAllExpensesRequest, ExpensesResult>
 {
   private readonly IMediator _mediator;
 
@@ -42,13 +41,13 @@ public class GetAllExpensesEndpoint : Endpoint<GetAllExpensesRequest, ExpensesQu
     AllowAnonymous();
     Description(d => d
         .WithName("GetAllExpenses")
-        .Produces<ExpensesQueryResult>(200)
+        .Produces<ExpensesResult>(200)
         .WithTags("Expenses"));
   }
 
   public override async Task HandleAsync(GetAllExpensesRequest req, CancellationToken ct)
   {
-    var query = new ExpensesQuery
+    var query = new GetExpensesQuery
     {
       StartDate = req.StartDate,
       EndDate = req.EndDate,

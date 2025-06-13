@@ -4,12 +4,12 @@ namespace Core.Domain;
 
 public class Category : BaseEntity
 {
-  public string Name { get; private set; }
-  public string Description { get; private set; }
+  public string Name { get; private set; } = null!;
+  public string? Description { get; private set; }
 
   private Category() { }
 
-  public Category(string name, string description = null)
+  public Category(string name, string? description = null)
   {
     if (string.IsNullOrWhiteSpace(name))
       throw new ArgumentException("Name cannot be empty", nameof(name));
@@ -26,7 +26,7 @@ public class Category : BaseEntity
     Name = newName;
   }
 
-  public void UpdateDescription(string description)
+  public void UpdateDescription(string? description)
   {
     Description = description;
   }

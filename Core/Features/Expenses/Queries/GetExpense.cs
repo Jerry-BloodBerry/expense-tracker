@@ -1,9 +1,6 @@
 using Core.Domain;
 using Core.Interfaces;
 using MediatR;
-using CategoryDto = Features.Expenses.CategoryDto;
-using ExpenseDto = Features.Expenses.ExpenseDto;
-using TagDto = Features.Expenses.TagDto;
 
 namespace Core.Features.Expenses.Queries;
 

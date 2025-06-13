@@ -1,30 +1,30 @@
 using Core.Domain;
 
-namespace Features.Expenses.Queries;
+namespace Core.Features.Expenses.Queries;
 
 public class ExpenseDto
 {
-  public int Id { get; set; }
-  public string Name { get; set; } = string.Empty;
-  public decimal Amount { get; set; }
-  public DateTime Date { get; set; }
-  public string? Description { get; set; }
-  public string Currency { get; set; } = string.Empty;
-  public bool IsRecurring { get; set; }
-  public RecurrenceInterval? RecurrenceInterval { get; set; }
-  public CategoryDto Category { get; set; } = null!;
-  public List<TagDto> Tags { get; set; } = new();
+  public required int Id { get; init; }
+  public required string Name { get; init; }
+  public required decimal Amount { get; init; }
+  public DateTime Date { get; init; }
+  public string? Description { get; init; }
+  public required string Currency { get; init; }
+  public bool IsRecurring { get; init; }
+  public RecurrenceInterval? RecurrenceInterval { get; init; }
+  public CategoryDto? Category { get; init; }
+  public List<TagDto> Tags { get; init; } = [];
 }
 
 public class CategoryDto
 {
-  public int Id { get; set; }
-  public string Name { get; set; } = string.Empty;
+  public required int Id { get; init; }
+  public required string Name { get; init; }
   public string? Description { get; set; }
 }
 
 public class TagDto
 {
-  public int Id { get; set; }
-  public string Name { get; set; } = string.Empty;
+  public required int Id { get; init; }
+  public required string Name { get; init; }
 }
