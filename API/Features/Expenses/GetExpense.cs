@@ -48,12 +48,8 @@ public class GetExpenseEndpoint : Endpoint<GetExpenseRequest, ExpenseResponse>
       Currency: expense.Currency,
       IsRecurring: expense.IsRecurring,
       RecurrenceInterval: expense.RecurrenceInterval?.ToString(),
-      Category: new CategoryResponse(
-        Id: expense.Category.Id,
-        Name: expense.Category.Name,
-        Description: expense.Category.Description
-      ),
-      Tags: expense.Tags.Select(t => new TagResponse(Id: t.Id, Name: t.Name)).ToList()
+      Category: expense.Category.Id,
+      Tags: expense.Tags.Select(t => t.Id).ToList()
     );
 
     await SendOkAsync(response, ct);

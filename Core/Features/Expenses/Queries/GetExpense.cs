@@ -30,17 +30,8 @@ public class GetExpenseHandler : IRequestHandler<GetExpenseQuery, ExpenseDto>
       Currency = expense.Currency,
       IsRecurring = expense.IsRecurring,
       RecurrenceInterval = expense.RecurrenceInterval,
-      Category = new CategoryDto
-      {
-        Id = expense.Category.Id,
-        Name = expense.Category.Name,
-        Description = expense.Category.Description
-      },
-      Tags = expense.Tags.Select(t => new TagDto
-      {
-        Id = t.Id,
-        Name = t.Name
-      }).ToList()
+      Category = new CategoryDto(expense.Category.Id),
+      Tags = expense.Tags.Select(t => new TagDto(t.Id)).ToList()
     };
   }
 }

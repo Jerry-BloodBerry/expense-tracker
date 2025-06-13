@@ -4,7 +4,7 @@ namespace Core.Domain;
 
 public class Tag : BaseEntity
 {
-  public string Name { get; private set; }
+  public string Name { get; private set; } = null!;
 
   private Tag() { }
 

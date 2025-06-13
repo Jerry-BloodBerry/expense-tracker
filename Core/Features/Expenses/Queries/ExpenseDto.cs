@@ -2,7 +2,7 @@ using Core.Domain;
 
 namespace Core.Features.Expenses.Queries;
 
-public class ExpenseDto
+public record ExpenseDto
 {
   public required int Id { get; init; }
   public required string Name { get; init; }
@@ -16,15 +16,6 @@ public class ExpenseDto
   public List<TagDto> Tags { get; init; } = [];
 }
 
-public class CategoryDto
-{
-  public required int Id { get; init; }
-  public required string Name { get; init; }
-  public string? Description { get; set; }
-}
+public record CategoryDto(int Id);
 
-public class TagDto
-{
-  public required int Id { get; init; }
-  public required string Name { get; init; }
-}
+public record TagDto(int Id);
