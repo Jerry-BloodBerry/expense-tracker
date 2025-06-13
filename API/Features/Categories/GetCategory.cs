@@ -1,12 +1,11 @@
-using Core.Features.Categories;
 using Core.Features.Categories.Queries;
-using Core.Domain;
 using FastEndpoints;
 using MediatR;
+using API.Utils.Response;
 
 namespace API.Features.Categories;
 
-public class GetCategoryEndpoint : EndpointWithoutRequest<CategoryDto>
+public class GetCategoryEndpoint : EndpointWithoutRequest<SingleResponse<CategoryResponse>>
 {
   private readonly IMediator _mediator;
 
@@ -21,7 +20,8 @@ public class GetCategoryEndpoint : EndpointWithoutRequest<CategoryDto>
     AllowAnonymous();
     Description(d => d
         .WithName("GetCategory")
-        .Produces<CategoryDto>(200)
+        .WithSummary("Get category by ID")
+        .Produces<SingleResponse<CategoryResponse>>(200)
         .ProducesProblem(404)
         .WithTags("Categories"));
   }
@@ -30,15 +30,21 @@ public class GetCategoryEndpoint : EndpointWithoutRequest<CategoryDto>
   {
     var id = Route<int>("id");
     var query = new GetCategoryQuery(id);
+    var result = await _mediator.Send(query, ct);
 
-    try
+    if (result.IsError)
     {
-      var category = await _mediator.Send(query, ct);
-      await SendOkAsync(category, ct);
+      await ProblemResult.Of(result.Errors, HttpContext).ExecuteAsync(HttpContext);
+      return;
     }
-    catch (NotFoundException)
+
+    var response = new CategoryResponse
     {
-      await SendNotFoundAsync(ct);
-    }
+      Id = result.Value.Id,
+      Name = result.Value.Name,
+      Description = result.Value.Description
+    };
+
+    await SendOkAsync(SingleResponse.Of(response), ct);
   }
 }

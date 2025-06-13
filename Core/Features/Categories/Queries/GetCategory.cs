@@ -1,12 +1,13 @@
 using Core.Domain;
 using Core.Interfaces;
 using MediatR;
+using ErrorOr;
 
 namespace Core.Features.Categories.Queries;
 
-public record GetCategoryQuery(int Id) : IRequest<CategoryDto>;
+public record GetCategoryQuery(int Id) : IRequest<ErrorOr<CategoryDto>>;
 
-public class GetCategoryHandler : IRequestHandler<GetCategoryQuery, CategoryDto>
+public class GetCategoryHandler : IRequestHandler<GetCategoryQuery, ErrorOr<CategoryDto>>
 {
   private readonly IGenericRepository<Category> _categoryRepository;
 
@@ -15,10 +16,11 @@ public class GetCategoryHandler : IRequestHandler<GetCategoryQuery, CategoryDto>
     _categoryRepository = categoryRepository;
   }
 
-  public async Task<CategoryDto> Handle(GetCategoryQuery request, CancellationToken cancellationToken)
+  public async Task<ErrorOr<CategoryDto>> Handle(GetCategoryQuery request, CancellationToken cancellationToken)
   {
-    var category = await _categoryRepository.GetByIdAsync(request.Id, cancellationToken)
-        ?? throw new NotFoundException($"Category with ID {request.Id} not found");
+    var category = await _categoryRepository.GetByIdAsync(request.Id, cancellationToken);
+    if (category is null)
+      return CategoryErrors.NotFound(request.Id);
 
     return new CategoryDto
     {

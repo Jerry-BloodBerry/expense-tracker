@@ -1,7 +1,7 @@
 using Core.Features.Categories.Commands;
-using Core.Domain;
 using FastEndpoints;
 using MediatR;
+using API.Utils.Response;
 
 namespace API.Features.Categories;
 
@@ -11,7 +11,7 @@ public class UpdateCategoryRequest
   public string? Description { get; init; }
 }
 
-public class UpdateCategoryEndpoint : Endpoint<UpdateCategoryRequest>
+public class UpdateCategoryEndpoint : Endpoint<UpdateCategoryRequest, SingleResponse<CategoryResponse>>
 {
   private readonly IMediator _mediator;
 
@@ -26,7 +26,8 @@ public class UpdateCategoryEndpoint : Endpoint<UpdateCategoryRequest>
     AllowAnonymous();
     Description(d => d
         .WithName("UpdateCategory")
-        .Produces(204)
+        .WithSummary("Update category")
+        .Produces<SingleResponse<CategoryResponse>>(200)
         .ProducesProblem(404)
         .WithTags("Categories"));
   }
@@ -41,14 +42,21 @@ public class UpdateCategoryEndpoint : Endpoint<UpdateCategoryRequest>
       Description = req.Description
     };
 
-    try
+    var result = await _mediator.Send(command, ct);
+
+    if (result.IsError)
     {
-      await _mediator.Send(command, ct);
-      await SendNoContentAsync(ct);
+      await ProblemResult.Of(result.Errors, HttpContext).ExecuteAsync(HttpContext);
+      return;
     }
-    catch (NotFoundException)
+
+    var response = new CategoryResponse
     {
-      await SendNotFoundAsync(ct);
-    }
+      Id = result.Value.Id,
+      Name = result.Value.Name,
+      Description = result.Value.Description
+    };
+
+    await SendOkAsync(SingleResponse.Of(response), ct);
   }
 }

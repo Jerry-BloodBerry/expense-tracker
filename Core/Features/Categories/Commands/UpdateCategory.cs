@@ -1,17 +1,18 @@
 using Core.Domain;
 using Core.Interfaces;
 using MediatR;
+using ErrorOr;
 
 namespace Core.Features.Categories.Commands;
 
-public record UpdateCategoryCommand : IRequest<Unit>
+public record UpdateCategoryCommand : IRequest<ErrorOr<CategoryDto>>
 {
   public int Id { get; init; }
   public string Name { get; init; }
   public string? Description { get; init; }
 }
 
-public class UpdateCategoryHandler : IRequestHandler<UpdateCategoryCommand, Unit>
+public class UpdateCategoryHandler : IRequestHandler<UpdateCategoryCommand, ErrorOr<CategoryDto>>
 {
   private readonly IGenericRepository<Category> _categoryRepository;
 
@@ -20,16 +21,31 @@ public class UpdateCategoryHandler : IRequestHandler<UpdateCategoryCommand, Unit
     _categoryRepository = categoryRepository;
   }
 
-  public async Task<Unit> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
+  public async Task<ErrorOr<CategoryDto>> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
   {
-    var category = await _categoryRepository.GetByIdAsync(request.Id, cancellationToken)
-        ?? throw new NotFoundException($"Category with ID {request.Id} not found");
+    var category = await _categoryRepository.GetByIdAsync(request.Id, cancellationToken);
+    if (category is null)
+      return CategoryErrors.NotFound(request.Id);
 
-    category.UpdateName(request.Name);
-    category.UpdateDescription(request.Description);
+    try
+    {
+      category.UpdateName(request.Name);
+      category.UpdateDescription(request.Description);
 
-    await _categoryRepository.SaveChangesAsync(cancellationToken);
+      await _categoryRepository.SaveChangesAsync(cancellationToken);
 
-    return Unit.Value;
+      return new CategoryDto
+      {
+        Id = category.Id,
+        Name = category.Name,
+        Description = category.Description
+      };
+    }
+    catch (ArgumentException ex)
+    {
+      return Error.Validation(
+        code: "Category.Validation",
+        description: ex.Message);
+    }
   }
 }

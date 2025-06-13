@@ -1,6 +1,6 @@
-namespace Core.Features.Categories;
+namespace API.Features.Categories;
 
-public class CategoryDto
+public class CategoryResponse
 {
   public int Id { get; init; }
   public string Name { get; init; } = string.Empty;

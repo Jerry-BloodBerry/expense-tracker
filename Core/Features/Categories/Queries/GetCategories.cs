@@ -1,12 +1,13 @@
 using Core.Domain;
 using Core.Interfaces;
 using MediatR;
+using ErrorOr;
 
 namespace Core.Features.Categories.Queries;
 
-public record GetCategoriesQuery : IRequest<List<CategoryDto>>;
+public record GetCategoriesQuery : IRequest<ErrorOr<List<CategoryDto>>>;
 
-public class GetCategoriesHandler : IRequestHandler<GetCategoriesQuery, List<CategoryDto>>
+public class GetCategoriesHandler : IRequestHandler<GetCategoriesQuery, ErrorOr<List<CategoryDto>>>
 {
   private readonly IGenericRepository<Category> _categoryRepository;
 
@@ -15,7 +16,7 @@ public class GetCategoriesHandler : IRequestHandler<GetCategoriesQuery, List<Cat
     _categoryRepository = categoryRepository;
   }
 
-  public async Task<List<CategoryDto>> Handle(GetCategoriesQuery request, CancellationToken cancellationToken)
+  public async Task<ErrorOr<List<CategoryDto>>> Handle(GetCategoriesQuery request, CancellationToken cancellationToken)
   {
     var categories = await _categoryRepository.ListAllAsync(cancellationToken);
 

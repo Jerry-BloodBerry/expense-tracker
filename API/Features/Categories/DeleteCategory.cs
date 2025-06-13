@@ -1,7 +1,7 @@
 using Core.Features.Categories.Commands;
-using Core.Domain;
 using FastEndpoints;
 using MediatR;
+using API.Utils.Response;
 
 namespace API.Features.Categories;
 
@@ -20,6 +20,7 @@ public class DeleteCategoryEndpoint : EndpointWithoutRequest
     AllowAnonymous();
     Description(d => d
         .WithName("DeleteCategory")
+        .WithSummary("Delete category")
         .Produces(204)
         .ProducesProblem(404)
         .WithTags("Categories"));
@@ -30,14 +31,14 @@ public class DeleteCategoryEndpoint : EndpointWithoutRequest
     var id = Route<int>("id");
     var command = new DeleteCategoryCommand(id);
 
-    try
+    var result = await _mediator.Send(command, ct);
+
+    if (result.IsError)
     {
-      await _mediator.Send(command, ct);
-      await SendNoContentAsync(ct);
+      await ProblemResult.Of(result.Errors, HttpContext).ExecuteAsync(HttpContext);
+      return;
     }
-    catch (NotFoundException)
-    {
-      await SendNotFoundAsync(ct);
-    }
+
+    await SendNoContentAsync(ct);
   }
 }

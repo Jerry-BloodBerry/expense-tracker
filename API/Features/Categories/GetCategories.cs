@@ -1,11 +1,11 @@
-using Core.Features.Categories;
 using Core.Features.Categories.Queries;
 using FastEndpoints;
 using MediatR;
+using API.Utils.Response;
 
 namespace API.Features.Categories;
 
-public class GetCategoriesEndpoint : EndpointWithoutRequest<List<CategoryDto>>
+public class GetCategoriesEndpoint : EndpointWithoutRequest<ListResponse<CategoryResponse>>
 {
   private readonly IMediator _mediator;
 
@@ -20,14 +20,29 @@ public class GetCategoriesEndpoint : EndpointWithoutRequest<List<CategoryDto>>
     AllowAnonymous();
     Description(d => d
         .WithName("GetCategories")
-        .Produces<List<CategoryDto>>(200)
+        .WithSummary("Get all categories")
+        .Produces<ListResponse<CategoryResponse>>(200)
         .WithTags("Categories"));
   }
 
   public override async Task HandleAsync(CancellationToken ct)
   {
     var query = new GetCategoriesQuery();
-    var categories = await _mediator.Send(query, ct);
-    await SendOkAsync(categories, ct);
+    var result = await _mediator.Send(query, ct);
+
+    if (result.IsError)
+    {
+      await ProblemResult.Of(result.Errors, HttpContext).ExecuteAsync(HttpContext);
+      return;
+    }
+
+    var response = result.Value.Select(c => new CategoryResponse
+    {
+      Id = c.Id,
+      Name = c.Name,
+      Description = c.Description
+    }).ToList();
+
+    await SendOkAsync(ListResponse.Of(response), ct);
   }
 }
