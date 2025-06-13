@@ -1,10 +1,12 @@
+using API.Common.Models;
+using API.Utils.Response;
 using Core.Features.Expenses.Queries;
 using FastEndpoints;
 using MediatR;
 
 namespace API.Features.Expenses;
 
-public record GetAllExpensesRequest
+public record GetAllExpensesRequest : PaginatedRequest
 {
   [QueryParam]
   public DateTime? StartDate { get; init; }
@@ -13,20 +15,16 @@ public record GetAllExpensesRequest
   [QueryParam]
   public int? CategoryId { get; init; }
   [QueryParam]
-  public List<int> TagIds { get; init; } = new();
+  public List<int>? TagIds { get; init; }
   [QueryParam]
   public decimal? MinAmount { get; init; }
   [QueryParam]
   public decimal? MaxAmount { get; init; }
   [QueryParam]
   public bool? IsRecurring { get; init; }
-  [QueryParam]
-  public int Page { get; init; } = 1;
-  [QueryParam]
-  public int PageSize { get; init; } = 10;
 }
 
-public class GetAllExpensesEndpoint : Endpoint<GetAllExpensesRequest, ExpensesResult>
+public class GetAllExpensesEndpoint : Endpoint<GetAllExpensesRequest, PaginatedResult<ExpenseResponse>>
 {
   private readonly IMediator _mediator;
 
@@ -41,7 +39,8 @@ public class GetAllExpensesEndpoint : Endpoint<GetAllExpensesRequest, ExpensesRe
     AllowAnonymous();
     Description(d => d
         .WithName("GetAllExpenses")
-        .Produces<ExpensesResult>(200)
+        .WithSummary("Get all expenses with pagination")
+        .Produces<PaginatedResult<ExpenseResponse>>(200)
         .WithTags("Expenses"));
   }
 
@@ -52,15 +51,23 @@ public class GetAllExpensesEndpoint : Endpoint<GetAllExpensesRequest, ExpensesRe
       StartDate = req.StartDate,
       EndDate = req.EndDate,
       CategoryId = req.CategoryId,
-      TagIds = req.TagIds,
+      TagIds = req.TagIds ?? [],
       MinAmount = req.MinAmount,
       MaxAmount = req.MaxAmount,
       IsRecurring = req.IsRecurring,
-      Page = req.Page,
-      PageSize = Math.Min(req.PageSize, 50)
+      Page = req.Page ?? 1,
+      PageSize = Math.Min(req.PageSize ?? 10, 50)
     };
 
     var result = await _mediator.Send(query, ct);
-    await SendOkAsync(result, ct);
+    var response = new PaginatedResult<ExpenseResponse>
+    {
+      Data = result.Items.Select(dto => dto.AsResponse()).ToList(),
+      TotalCount = result.TotalCount,
+      Page = result.Page,
+      PageSize = result.PageSize
+    };
+
+    await SendOkAsync(response, ct);
   }
 }

@@ -12,7 +12,7 @@ public class ExpenseDto
   public required string Currency { get; init; }
   public bool IsRecurring { get; init; }
   public RecurrenceInterval? RecurrenceInterval { get; init; }
-  public CategoryDto? Category { get; init; }
+  public required CategoryDto Category { get; init; }
   public List<TagDto> Tags { get; init; } = [];
 }
 
