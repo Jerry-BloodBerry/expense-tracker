@@ -26,7 +26,7 @@ A modern, robust expense tracking application built with .NET 8 that helps you m
    cd expense-tracker
    ```
 
-2. Set up HTTPS development certificate:
+2. Set up HTTPS development certificate (Windows):
    ```bash
    # Generate HTTPS development certificate
    dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\aspnetapp.pfx -p password
@@ -59,22 +59,6 @@ A modern, robust expense tracking application built with .NET 8 that helps you m
 Once the application is running, you can access the Swagger documentation at:
 - http://localhost:5000/swagger
 - https://localhost:5001/swagger
-
-### Key Endpoints
-
-#### Categories
-- `GET /api/categories` - Get all categories
-- `GET /api/categories/{id}` - Get a specific category
-- `POST /api/categories` - Create a new category
-- `PUT /api/categories/{id}` - Update a category
-- `DELETE /api/categories/{id}` - Delete a category
-
-#### Expenses
-- `GET /api/expenses` - Get all expenses (with filtering)
-- `GET /api/expenses/{id}` - Get a specific expense
-- `POST /api/expenses` - Create a new expense
-- `PUT /api/expenses/{id}` - Update an expense
-- `DELETE /api/expenses/{id}` - Delete an expense
 
 ## Project Structure
 
