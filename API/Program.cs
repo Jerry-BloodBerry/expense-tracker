@@ -8,6 +8,7 @@ using Infrastructure.Data.Repository;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.HttpOverrides;
 using API.Swagger;
+using Infrastructure.Seeding;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,14 @@ builder.Services.AddDbContext<StoreContext>(options =>
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+// Add DataSeeder
+builder.Services.AddScoped<DataSeeder>();
+
+// Add Seeders
+builder.Services.AddScoped<CategorySeeder>();
+builder.Services.AddScoped<TagSeeder>();
+builder.Services.AddScoped<ExpenseSeeder>();
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -73,7 +82,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerGen();
 }
 
-// Apply migrations on startup
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -89,6 +97,12 @@ using (var scope = app.Services.CreateScope())
     {
         logger.LogError(ex, "An error occurred while migrating the database");
         throw;
+    }
+
+    if (app.Environment.IsDevelopment())
+    {
+        var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+        await seeder.SeedAsync();
     }
 }
 

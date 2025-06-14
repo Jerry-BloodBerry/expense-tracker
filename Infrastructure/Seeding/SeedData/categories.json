@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Groceries",
+    "description": "Food and household items"
+  },
+  {
+    "id": 2,
+    "name": "Transportation",
+    "description": "Public transport, fuel, and car maintenance"
+  },
+  {
+    "id": 3,
+    "name": "Entertainment",
+    "description": "Movies, games, and other leisure activities"
+  },
+  {
+    "id": 4,
+    "name": "Utilities",
+    "description": "Electricity, water, gas, and internet"
+  },
+  {
+    "id": 5,
+    "name": "Health",
+    "description": "Medical expenses and healthcare"
+  },
+  {
+    "id": 6,
+    "name": "Education",
+    "description": "Courses, books, and learning materials"
+  },
+  {
+    "id": 7,
+    "name": "Shopping",
+    "description": "Clothes, electronics, and other purchases"
+  }
+] 

@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "Essential"
+  },
+  {
+    "id": 2,
+    "name": "Luxury"
+  },
+  {
+    "id": 3,
+    "name": "Monthly"
+  },
+  {
+    "id": 4,
+    "name": "Work"
+  },
+  {
+    "id": 5,
+    "name": "Personal"
+  },
+  {
+    "id": 6,
+    "name": "Family"
+  },
+  {
+    "id": 7,
+    "name": "Investment"
+  }
+] 
