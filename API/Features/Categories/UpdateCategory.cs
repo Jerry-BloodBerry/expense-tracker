@@ -25,7 +25,6 @@ public class UpdateCategoryEndpoint : Endpoint<UpdateCategoryRequest, SingleResp
     Put("/api/categories/{id}");
     AllowAnonymous();
     Description(d => d
-        .WithName("UpdateCategory")
         .WithSummary("Update category")
         .Produces<SingleResponse<CategoryResponse>>(200)
         .ProducesProblem(404)

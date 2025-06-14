@@ -18,7 +18,7 @@ public class DeleteExpenseEndpoint : Endpoint<DeleteExpenseCommand>
     Delete("/api/expenses/{Id:int}");
     AllowAnonymous();
     Description(d => d
-        .WithName("DeleteExpense")
+        .WithSummary("Delete expense")
         .Produces(204)
         .ProducesProblem(404)
         .WithTags("Expenses"));

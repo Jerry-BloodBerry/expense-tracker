@@ -24,7 +24,6 @@ public class DeleteTagEndpoint : Endpoint<DeleteTagRequest>
     Delete("/api/tags/{id}");
     AllowAnonymous();
     Description(d => d
-        .WithName("DeleteTag")
         .WithSummary("Delete tag")
         .Produces(204)
         .ProducesProblem(404)

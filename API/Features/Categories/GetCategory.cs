@@ -19,7 +19,6 @@ public class GetCategoryEndpoint : EndpointWithoutRequest<SingleResponse<Categor
     Get("/api/categories/{id}");
     AllowAnonymous();
     Description(d => d
-        .WithName("GetCategory")
         .WithSummary("Get category by ID")
         .Produces<SingleResponse<CategoryResponse>>(200)
         .ProducesProblem(404)

@@ -21,7 +21,6 @@ public class CreateTagEndpoint : Endpoint<CreateTagRequest, SingleResponse<TagRe
     Post("/api/tags");
     AllowAnonymous();
     Description(d => d
-        .WithName("CreateTag")
         .WithSummary("Create new tag")
         .Produces<SingleResponse<TagResponse>>(201)
         .ProducesProblem(400)

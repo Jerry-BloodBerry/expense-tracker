@@ -20,12 +20,10 @@ public class UpdateTagEndpoint : Endpoint<UpdateTagRequest, SingleResponse<TagRe
     Put("/api/tags/{id}");
     AllowAnonymous();
     Description(d => d
-        .WithName("UpdateTag")
         .WithSummary("Update tag")
         .Produces<SingleResponse<TagResponse>>(200)
         .ProducesProblem(404)
         .WithTags("Tags"));
-
   }
 
   public override async Task HandleAsync(UpdateTagRequest req, CancellationToken ct)

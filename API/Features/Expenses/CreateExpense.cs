@@ -18,7 +18,7 @@ public class CreateExpenseEndpoint : Endpoint<CreateExpenseCommand, int>
     Post("/api/expenses");
     AllowAnonymous();
     Description(d => d
-        .WithName("CreateExpense")
+        .WithSummary("Create expense")
         .Produces<int>(201)
         .ProducesProblem(400)
         .WithTags("Expenses"));
@@ -30,6 +30,7 @@ public class CreateExpenseEndpoint : Endpoint<CreateExpenseCommand, int>
     await SendCreatedAtAsync<GetExpenseEndpoint>(
         new { id = expenseId },
         expenseId,
+        generateAbsoluteUrl: true,
         cancellation: ct);
   }
 }

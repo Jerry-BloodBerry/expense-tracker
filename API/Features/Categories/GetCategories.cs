@@ -19,7 +19,6 @@ public class GetCategoriesEndpoint : EndpointWithoutRequest<ListResponse<Categor
     Get("/api/categories");
     AllowAnonymous();
     Description(d => d
-        .WithName("GetCategories")
         .WithSummary("Get all categories")
         .Produces<ListResponse<CategoryResponse>>(200)
         .WithTags("Categories"));

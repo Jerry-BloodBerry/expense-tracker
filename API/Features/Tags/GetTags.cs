@@ -19,7 +19,6 @@ public class GetTagsEndpoint : EndpointWithoutRequest<ListResponse<TagResponse>>
     Get("/api/tags");
     AllowAnonymous();
     Description(d => d
-        .WithName("GetTags")
         .WithSummary("Get all tags")
         .Produces<ListResponse<TagResponse>>(200)
         .WithTags("Tags"));

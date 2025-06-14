@@ -38,7 +38,6 @@ public class GetAllExpensesEndpoint : Endpoint<GetAllExpensesRequest, PaginatedR
     Get("/api/expenses");
     AllowAnonymous();
     Description(d => d
-        .WithName("GetAllExpenses")
         .WithSummary("Get all expenses with pagination")
         .Produces<PaginatedResult<ExpenseResponse>>(200)
         .WithTags("Expenses"));

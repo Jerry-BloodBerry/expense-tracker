@@ -25,7 +25,6 @@ public class CreateCategoryEndpoint : Endpoint<CreateCategoryRequest, SingleResp
     Post("/api/categories");
     AllowAnonymous();
     Description(d => d
-        .WithName("CreateCategory")
         .WithSummary("Create new category")
         .Produces<SingleResponse<CategoryResponse>>(201)
         .ProducesProblem(400)

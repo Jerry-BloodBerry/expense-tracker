@@ -23,7 +23,7 @@ public class GetExpenseEndpoint : Endpoint<GetExpenseRequest, ExpenseResponse>
     Get("/api/expenses/{id}");
     AllowAnonymous();
     Description(d => d
-        .WithName("GetExpense")
+        .WithSummary("Get expense by ID")
         .Produces<ExpenseResponse>(200)
         .ProducesProblem(404)
         .WithTags("Expenses"));

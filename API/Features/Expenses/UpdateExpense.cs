@@ -18,7 +18,7 @@ public class UpdateExpenseEndpoint : Endpoint<UpdateExpenseCommand>
     Put("/api/expenses/{id}");
     AllowAnonymous();
     Description(d => d
-        .WithName("UpdateExpense")
+        .WithSummary("Update expense")
         .Produces(204)
         .ProducesProblem(404)
         .WithTags("Expenses"));

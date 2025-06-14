@@ -19,7 +19,6 @@ public class DeleteCategoryEndpoint : EndpointWithoutRequest
     Delete("/api/categories/{id}");
     AllowAnonymous();
     Description(d => d
-        .WithName("DeleteCategory")
         .WithSummary("Delete category")
         .Produces(204)
         .ProducesProblem(404)

@@ -25,7 +25,6 @@ public class GetTagEndpoint : Endpoint<GetTagRequest, SingleResponse<TagResponse
     Get("/api/tags/{id}");
     AllowAnonymous();
     Description(d => d
-        .WithName("GetTag")
         .WithSummary("Get single tag")
         .Produces<SingleResponse<TagResponse>>(200)
         .ProducesProblem(404)
