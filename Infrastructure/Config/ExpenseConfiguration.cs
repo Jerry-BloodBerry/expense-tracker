@@ -36,9 +36,6 @@ namespace Infrastructure.Config
             builder.Property(e => e.RecurrenceInterval)
                 .HasConversion(new EnumToStringConverter<RecurrenceInterval>());
 
-            builder.Navigation(e => e.Category).AutoInclude();
-            builder.Navigation(e => e.Tags).AutoInclude();
-
             builder.HasOne(e => e.Category)
                 .WithMany()
                 .HasForeignKey("CategoryId")
@@ -47,6 +44,9 @@ namespace Infrastructure.Config
             builder.HasMany(e => e.Tags)
                 .WithMany()
                 .UsingEntity(j => j.ToTable("ExpenseTags"));
+
+            builder.Navigation(e => e.Category).AutoInclude();
+            builder.Navigation(e => e.Tags).AutoInclude();
 
             // Indexes
             builder.HasIndex("CategoryId");

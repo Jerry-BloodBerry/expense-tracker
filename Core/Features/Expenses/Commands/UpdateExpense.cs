@@ -1,11 +1,13 @@
 using Core.Domain;
+using Core.Features.Expenses.Queries;
 using Core.Features.Tags.Specifications;
 using Core.Interfaces;
 using MediatR;
+using ErrorOr;
 
 namespace Core.Features.Expenses.Commands;
 
-public record UpdateExpenseCommand : IRequest<Unit>
+public record UpdateExpenseCommand : IRequest<ErrorOr<ExpenseDto>>
 {
   public int Id { get; init; }
   public required string Name { get; init; }
@@ -19,7 +21,7 @@ public record UpdateExpenseCommand : IRequest<Unit>
   public List<int> TagIds { get; init; } = [];
 }
 
-public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, Unit>
+public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ErrorOr<ExpenseDto>>
 {
   private readonly IGenericRepository<Expense> _expenseRepository;
   private readonly IGenericRepository<Category> _categoryRepository;
@@ -35,32 +37,59 @@ public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, Unit>
     _tagRepository = tagRepository;
   }
 
-  public async Task<Unit> Handle(UpdateExpenseCommand request, CancellationToken cancellationToken)
+  public async Task<ErrorOr<ExpenseDto>> Handle(UpdateExpenseCommand request, CancellationToken cancellationToken)
   {
-    var expense = await _expenseRepository.GetByIdAsync(request.Id, cancellationToken)
-    ?? throw new NotFoundException($"Expense with ID {request.Id} not found");
-
-    var category = await _categoryRepository.GetByIdAsync(request.CategoryId, cancellationToken)
-        ?? throw new NotFoundException($"Category with ID {request.CategoryId} not found");
-
-    expense.UpdateCategory(category);
-    expense.UpdateAmount(request.Amount);
-    expense.SetDescription(request.Description);
-
-    if (request.IsRecurring && request.RecurrenceInterval.HasValue)
+    try
     {
-      expense.SetAsRecurring(request.RecurrenceInterval.Value);
+      var expense = await _expenseRepository.GetByIdAsync(request.Id, cancellationToken);
+      if (expense is null)
+        return ExpenseErrors.NotFound(request.Id);
+
+      var category = await _categoryRepository.GetByIdAsync(request.CategoryId, cancellationToken);
+      if (category is null)
+        return ExpenseErrors.CategoryNotFound(request.CategoryId);
+
+      expense.UpdateCategory(category);
+      expense.UpdateAmount(request.Amount);
+      expense.SetDescription(request.Description);
+
+      if (request.IsRecurring && request.RecurrenceInterval.HasValue)
+      {
+        expense.SetAsRecurring(request.RecurrenceInterval.Value);
+      }
+      else
+      {
+        expense.RemoveRecurrence();
+      }
+
+      if (request.TagIds.Count != 0)
+      {
+        var tags = await _tagRepository.ListAsync(new TagsWithIdsSpecification(request.TagIds), cancellationToken);
+        if (tags.Count != request.TagIds.Count)
+          return ExpenseErrors.TagNotFound(request.TagIds.First(t => !tags.Any(tt => tt.Id == t)));
+
+        expense.UpdateTags(tags);
+      }
+
+      await _expenseRepository.SaveChangesAsync(cancellationToken);
+
+      return new ExpenseDto
+      {
+        Id = expense.Id,
+        Name = expense.Name,
+        Amount = expense.Amount,
+        Date = expense.Date,
+        Description = expense.Description,
+        Currency = expense.Currency,
+        IsRecurring = expense.IsRecurring,
+        RecurrenceInterval = expense.RecurrenceInterval,
+        Category = new CategoryDto(expense.Category.Id),
+        Tags = expense.Tags.Select(t => new TagDto(t.Id)).ToList()
+      };
     }
-    else
+    catch (ArgumentException ex)
     {
-      expense.RemoveRecurrence();
+      return ExpenseErrors.Validation(ex.Message);
     }
-
-    var newTags = await _tagRepository.ListAsync(new TagsWithIdsSpecification(request.TagIds), cancellationToken);
-    expense.UpdateTags(newTags);
-
-    await _expenseRepository.SaveChangesAsync(cancellationToken);
-
-    return Unit.Value;
   }
 }

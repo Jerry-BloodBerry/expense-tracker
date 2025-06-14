@@ -1,6 +1,7 @@
 using Core.Features.Expenses.Commands;
 using FastEndpoints;
 using MediatR;
+using API.Utils.Response;
 
 namespace API.Features.Expenses;
 
@@ -26,7 +27,14 @@ public class DeleteExpenseEndpoint : Endpoint<DeleteExpenseCommand>
 
   public override async Task HandleAsync(DeleteExpenseCommand req, CancellationToken ct)
   {
-    await _mediator.Send(req, ct);
+    var result = await _mediator.Send(req, ct);
+
+    if (result.IsError)
+    {
+      await ProblemResult.Of(result.Errors, HttpContext).ExecuteAsync(HttpContext);
+      return;
+    }
+
     await SendNoContentAsync(ct);
   }
 }

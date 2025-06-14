@@ -59,12 +59,19 @@ public class GetAllExpensesEndpoint : Endpoint<GetAllExpensesRequest, PaginatedR
     };
 
     var result = await _mediator.Send(query, ct);
+
+    if (result.IsError)
+    {
+      await ProblemResult.Of(result.Errors, HttpContext).ExecuteAsync(HttpContext);
+      return;
+    }
+
     var response = new PaginatedResult<ExpenseResponse>
     {
-      Data = result.Items.Select(dto => dto.AsResponse()).ToList(),
-      TotalCount = result.TotalCount,
-      Page = result.Page,
-      PageSize = result.PageSize
+      Data = result.Value.Items.Select(dto => dto.AsResponse()).ToList(),
+      TotalCount = result.Value.TotalCount,
+      Page = result.Value.Page,
+      PageSize = result.Value.PageSize
     };
 
     await SendOkAsync(response, ct);

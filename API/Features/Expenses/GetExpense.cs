@@ -3,6 +3,7 @@ using Core.Features.Expenses.Queries;
 using Core.Interfaces;
 using FastEndpoints;
 using MediatR;
+using API.Utils.Response;
 
 namespace API.Features.Expenses;
 
@@ -11,7 +12,7 @@ public record GetExpenseRequest
   public int Id { get; init; }
 }
 
-public class GetExpenseEndpoint : Endpoint<GetExpenseRequest, ExpenseResponse>
+public class GetExpenseEndpoint : Endpoint<GetExpenseRequest, SingleResponse<ExpenseResponse>>
 {
   private readonly IMediator _mediator;
 
@@ -26,7 +27,7 @@ public class GetExpenseEndpoint : Endpoint<GetExpenseRequest, ExpenseResponse>
     AllowAnonymous();
     Description(d => d
         .WithSummary("Get expense by ID")
-        .Produces<ExpenseResponse>(200)
+        .Produces<SingleResponse<ExpenseResponse>>(200)
         .ProducesProblem(404)
         .WithTags("Expenses"));
   }
@@ -34,21 +35,27 @@ public class GetExpenseEndpoint : Endpoint<GetExpenseRequest, ExpenseResponse>
   public override async Task HandleAsync(GetExpenseRequest req, CancellationToken ct)
   {
     var query = new GetExpenseQuery(req.Id);
-    var expense = await _mediator.Send(query, ct);
+    var result = await _mediator.Send(query, ct);
+
+    if (result.IsError)
+    {
+      await ProblemResult.Of(result.Errors, HttpContext).ExecuteAsync(HttpContext);
+      return;
+    }
 
     var response = new ExpenseResponse(
-      Id: expense.Id,
-      Name: expense.Name,
-      Amount: expense.Amount,
-      Date: expense.Date,
-      Description: expense.Description,
-      Currency: expense.Currency,
-      IsRecurring: expense.IsRecurring,
-      RecurrenceInterval: expense.RecurrenceInterval?.ToString(),
-      Category: expense.Category.Id,
-      Tags: expense.Tags.Select(t => t.Id).ToList()
+      Id: result.Value.Id,
+      Name: result.Value.Name,
+      Amount: result.Value.Amount,
+      Date: result.Value.Date,
+      Description: result.Value.Description,
+      Currency: result.Value.Currency,
+      IsRecurring: result.Value.IsRecurring,
+      RecurrenceInterval: result.Value.RecurrenceInterval?.ToString(),
+      Category: result.Value.Category.Id,
+      Tags: result.Value.Tags.Select(t => t.Id).ToList()
     );
 
-    await SendOkAsync(response, ct);
+    await SendOkAsync(SingleResponse.Of(response), ct);
   }
 }

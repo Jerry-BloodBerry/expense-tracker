@@ -69,6 +69,7 @@ public class Expense : BaseEntity
     {
         ArgumentNullException.ThrowIfNull(newTags);
 
+        // Create a new list with the new tags
         _tags.Clear();
         foreach (var tag in newTags)
         {

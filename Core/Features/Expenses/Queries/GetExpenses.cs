@@ -2,10 +2,11 @@ using Core.Domain;
 using Core.Features.Expenses.Specifications;
 using Core.Interfaces;
 using MediatR;
+using ErrorOr;
 
 namespace Core.Features.Expenses.Queries;
 
-public class GetExpensesQuery : IRequest<ExpensesResult>
+public class GetExpensesQuery : IRequest<ErrorOr<ExpensesResult>>
 {
   public DateTime? StartDate { get; init; }
   public DateTime? EndDate { get; init; }
@@ -27,7 +28,7 @@ public class ExpensesResult
   public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
 }
 
-public class GetExpensesHandler : IRequestHandler<GetExpensesQuery, ExpensesResult>
+public class GetExpensesHandler : IRequestHandler<GetExpensesQuery, ErrorOr<ExpensesResult>>
 {
   private readonly IGenericRepository<Expense> _expenseRepository;
 
@@ -36,11 +37,12 @@ public class GetExpensesHandler : IRequestHandler<GetExpensesQuery, ExpensesResu
     _expenseRepository = expenseRepository;
   }
 
-  public async Task<ExpensesResult> Handle(GetExpensesQuery request, CancellationToken cancellationToken)
+  public async Task<ErrorOr<ExpensesResult>> Handle(GetExpensesQuery request, CancellationToken cancellationToken)
   {
     var getSpec = new GetAllExpensesSpecification(request);
     var expenses = await _expenseRepository.ListAsync(getSpec, cancellationToken);
     var totalCount = await _expenseRepository.CountAsync(getSpec, cancellationToken);
+
     return new ExpensesResult
     {
       Items = expenses.Select(e => new ExpenseDto

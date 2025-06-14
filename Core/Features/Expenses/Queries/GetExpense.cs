@@ -1,13 +1,13 @@
 using Core.Domain;
-using Core.Features.Expenses.Specifications;
 using Core.Interfaces;
 using MediatR;
+using ErrorOr;
 
 namespace Core.Features.Expenses.Queries;
 
-public record GetExpenseQuery(int Id) : IRequest<ExpenseDto>;
+public record GetExpenseQuery(int Id) : IRequest<ErrorOr<ExpenseDto>>;
 
-public class GetExpenseHandler : IRequestHandler<GetExpenseQuery, ExpenseDto>
+public class GetExpenseHandler : IRequestHandler<GetExpenseQuery, ErrorOr<ExpenseDto>>
 {
   private readonly IGenericRepository<Expense> _expenseRepository;
 
@@ -16,11 +16,12 @@ public class GetExpenseHandler : IRequestHandler<GetExpenseQuery, ExpenseDto>
     _expenseRepository = expenseRepository;
   }
 
-  public async Task<ExpenseDto> Handle(GetExpenseQuery request, CancellationToken cancellationToken)
+  public async Task<ErrorOr<ExpenseDto>> Handle(GetExpenseQuery request, CancellationToken cancellationToken)
   {
-    var spec = new GetExpenseByIdSpecification(request.Id);
-    var expense = await _expenseRepository.GetEntityWithSpecAsync(spec, cancellationToken)
-        ?? throw new NotFoundException($"Expense with ID {request.Id} not found");
+    var expense = await _expenseRepository.GetByIdAsync(request.Id, cancellationToken);
+
+    if (expense is null)
+      return ExpenseErrors.NotFound(request.Id);
 
     return new ExpenseDto
     {
