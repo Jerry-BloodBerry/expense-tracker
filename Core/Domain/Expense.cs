@@ -98,7 +98,7 @@ public class Expense : BaseEntity
         if (!IsRecurring)
             throw new InvalidOperationException("Cannot create recurrence for non-recurring expense");
 
-        return new Expense
+        var newExpense = new Expense
         {
             Name = this.Name,
             Category = this.Category,
@@ -109,5 +109,12 @@ public class Expense : BaseEntity
             IsRecurring = true,
             RecurrenceInterval = this.RecurrenceInterval
         };
+
+        foreach (var tag in _tags)
+        {
+            newExpense.AddTag(tag);
+        }
+
+        return newExpense;
     }
 }

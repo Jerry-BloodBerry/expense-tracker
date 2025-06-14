@@ -1,6 +1,8 @@
 using Core.Domain;
+using Core.Features.Expenses.Queries;
 using Core.Interfaces;
 using FastEndpoints;
+using MediatR;
 
 namespace API.Features.Expenses;
 
@@ -11,11 +13,11 @@ public record GetExpenseRequest
 
 public class GetExpenseEndpoint : Endpoint<GetExpenseRequest, ExpenseResponse>
 {
-  private readonly IGenericRepository<Expense> _expenseRepository;
+  private readonly IMediator _mediator;
 
-  public GetExpenseEndpoint(IGenericRepository<Expense> expenseRepository)
+  public GetExpenseEndpoint(IMediator mediator)
   {
-    _expenseRepository = expenseRepository;
+    _mediator = mediator;
   }
 
   public override void Configure()
@@ -31,13 +33,8 @@ public class GetExpenseEndpoint : Endpoint<GetExpenseRequest, ExpenseResponse>
 
   public override async Task HandleAsync(GetExpenseRequest req, CancellationToken ct)
   {
-    var expense = await _expenseRepository.GetByIdAsync(req.Id, ct);
-
-    if (expense is null)
-    {
-      await SendNotFoundAsync(ct);
-      return;
-    }
+    var query = new GetExpenseQuery(req.Id);
+    var expense = await _mediator.Send(query, ct);
 
     var response = new ExpenseResponse(
       Id: expense.Id,

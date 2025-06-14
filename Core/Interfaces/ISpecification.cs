@@ -1,4 +1,3 @@
-
 using System.Linq.Expressions;
 
 namespace Core.Interfaces;
@@ -12,6 +11,7 @@ public interface ISpecification<T>
     int Take { get; }
     int Skip { get; }
     bool IsPagingEnabled { get; }
+    List<Expression<Func<T, object>>> Includes { get; }
     IQueryable<T> ApplyCriteria(IQueryable<T> query);
 }
 

@@ -1,4 +1,5 @@
 using Core.Domain;
+using Core.Features.Expenses.Specifications;
 using Core.Interfaces;
 using MediatR;
 
@@ -17,7 +18,8 @@ public class GetExpenseHandler : IRequestHandler<GetExpenseQuery, ExpenseDto>
 
   public async Task<ExpenseDto> Handle(GetExpenseQuery request, CancellationToken cancellationToken)
   {
-    var expense = await _expenseRepository.GetByIdAsync(request.Id, cancellationToken)
+    var spec = new GetExpenseByIdSpecification(request.Id);
+    var expense = await _expenseRepository.GetEntityWithSpecAsync(spec, cancellationToken)
         ?? throw new NotFoundException($"Expense with ID {request.Id} not found");
 
     return new ExpenseDto
