@@ -62,10 +62,16 @@ builder.Services.AddScoped<TagSeeder>();
 builder.Services.AddScoped<ExpenseSeeder>();
 
 builder.Services.AddAuthorization();
+builder.Services.AddCors();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseCors(c => c
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .WithOrigins("http://localhost:4200", "https://localhost:4200")
+);
 
 // Enable forwarded headers
 app.UseForwardedHeaders();
