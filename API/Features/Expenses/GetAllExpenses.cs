@@ -14,8 +14,18 @@ public record GetAllExpensesRequest : PaginatedRequest
   public DateTime? EndDate { get; init; }
   [QueryParam]
   public int? CategoryId { get; init; }
+
+  private List<string> _tagIds = [];
   [QueryParam]
-  public List<int>? TagIds { get; init; }
+  public List<string> TagIds
+  {
+    get => _tagIds;
+    set
+    {
+      _tagIds = value.SelectMany(x => x.Split(',', StringSplitOptions.RemoveEmptyEntries)).ToList();
+    }
+  }
+
   [QueryParam]
   public decimal? MinAmount { get; init; }
   [QueryParam]
@@ -50,7 +60,7 @@ public class GetAllExpensesEndpoint : Endpoint<GetAllExpensesRequest, PaginatedR
       StartDate = req.StartDate,
       EndDate = req.EndDate,
       CategoryId = req.CategoryId,
-      TagIds = req.TagIds ?? [],
+      TagIds = req.TagIds.Select(int.Parse).ToList() ?? [],
       MinAmount = req.MinAmount,
       MaxAmount = req.MaxAmount,
       IsRecurring = req.IsRecurring,
