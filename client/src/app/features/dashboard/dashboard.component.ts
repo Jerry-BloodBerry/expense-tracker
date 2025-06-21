@@ -1,18 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { TableModule } from 'primeng/table';
 import { Expense } from '../../shared/models/expense';
-import { FormatCurrencyPipe } from '../../shared/pipes/format-currency.pipe';
 import { ExpenseService } from '../../core/services/expense.service';
-import { Tag } from 'primeng/tag';
-import { Category } from '../../shared/models/category';
-import { getRandomTagColor } from '../../shared/utils/random-tag-color.util';
-import { RouterLink } from '@angular/router';
-import { Button } from 'primeng/button';
-import { DatePipe } from '@angular/common';
+
+import { RecentExpensesTableComponent } from "./components/recent-expenses-table/recent-expenses-table.component";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [Button, DatePipe, TableModule, FormatCurrencyPipe, Tag, RouterLink],
+  imports: [RecentExpensesTableComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -90,9 +84,4 @@ export class DashboardComponent implements OnInit {
     this.expenseService.getCategories();
   }
 
-  getCategoryDisplay(categoryId: number, categories: Category[]) {
-    const category = categories.find(c => c.id === categoryId);
-    if (!category) return { name: 'Unknown', color: '#BDBDBD' };
-    return { name: category.name, color: getRandomTagColor(category.name) };
-  }
 }
