@@ -9,10 +9,11 @@ import { ExpenseService } from '../../../../core/services/expense.service';
 import { TableModule } from 'primeng/table';
 import { getRandomTagColor } from '../../../../shared/utils/random-tag-color.util';
 import { Category } from '../../../../shared/models/category';
+import { CardModule } from 'primeng/card';
 
 @Component({
   selector: 'app-recent-expenses-table',
-  imports: [Button, DatePipe, FormatCurrencyPipe, TableModule, Tag, RouterLink],
+  imports: [Button, CardModule, DatePipe, FormatCurrencyPipe, TableModule, Tag, RouterLink],
   templateUrl: './recent-expenses-table.component.html',
   styleUrl: './recent-expenses-table.component.scss'
 })

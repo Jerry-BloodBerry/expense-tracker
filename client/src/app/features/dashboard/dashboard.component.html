@@ -1,5 +1,22 @@
 <div class="w-full">
   <div class="flex-col">
+    <div class="grid grid-cols-3 gap-4 mb-8">
+      <app-expense-summary-card
+        icon="pi pi-calendar-clock"
+        [header]="399.99 | formatCurrency : 'PLN'"
+        description="Total expenses this month"
+      />
+      <app-expense-summary-card
+        icon="pi pi-chart-line"
+        header="Shopping"
+        description="Top spending category"
+      />
+      <app-expense-summary-card
+        icon="pi pi-undo"
+        [header]="40.99 | formatCurrency : 'PLN'"
+        description="Recurring expenses this month"
+      />
+    </div>
     @if (expenses) {
     <app-recent-expenses-table [expenses]="expenses.data" />
     }
