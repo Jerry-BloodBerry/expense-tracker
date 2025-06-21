@@ -1,5 +1,7 @@
 <div class="w-full">
   <div class="flex-col">
-    <app-recent-expenses-table [expenses]="expenses" />
+    @if (expenses) {
+    <app-recent-expenses-table [expenses]="expenses.data" />
+    }
   </div>
 </div>
