@@ -1,6 +1,5 @@
 import { Component, inject, Input } from '@angular/core';
 import { Expense } from '../../../../shared/models/expense';
-import { Button } from 'primeng/button';
 import { DatePipe } from '@angular/common';
 import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 import { Tag } from 'primeng/tag';
@@ -10,10 +9,11 @@ import { TableModule } from 'primeng/table';
 import { getRandomTagColor } from '../../../../shared/utils/random-tag-color.util';
 import { Category } from '../../../../shared/models/category';
 import { CardModule } from 'primeng/card';
+import { CreateExpenseDialogComponent } from "../../../shared/components/create-expense-dialog/create-expense-dialog.component";
 
 @Component({
   selector: 'app-recent-expenses-table',
-  imports: [Button, CardModule, DatePipe, FormatCurrencyPipe, TableModule, Tag, RouterLink],
+  imports: [CardModule, DatePipe, FormatCurrencyPipe, TableModule, Tag, RouterLink, CreateExpenseDialogComponent],
   templateUrl: './recent-expenses-table.component.html',
   styleUrl: './recent-expenses-table.component.scss'
 })

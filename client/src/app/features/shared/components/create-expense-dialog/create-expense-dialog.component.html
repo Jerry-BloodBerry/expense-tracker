@@ -1,0 +1,129 @@
+<p-button
+  severity="contrast"
+  label="Add New"
+  icon="pi pi-plus-circle"
+  iconPos="left"
+  [raised]="true"
+  (click)="showDialog()"
+/>
+<p-dialog
+  header="Add Expense"
+  [modal]="true"
+  [(visible)]="visible"
+  [closeOnEscape]="true"
+  [dismissableMask]="true"
+>
+  <span class="p-text-secondary block mb-8">Create new expense</span>
+
+  <div class="flex items-center gap-4 mb-4">
+    <label for="title" class="font-semibold w-24">Title</label>
+    <p-float-label variant="on" style="display: flex !important; flex-grow: 1">
+      <input pInputText id="title" class="flex-auto" autocomplete="off" />
+      <label for="title">Title</label>
+    </p-float-label>
+  </div>
+  <div class="flex items-center gap-4 mb-4">
+    <label for="amount" class="font-semibold w-24">Amount</label>
+    <div class="flex gap-2">
+      <p-select
+        [(ngModel)]="selectedCurrency"
+        [options]="currencies"
+        placeholder="Select Currency"
+        (onChange)="onCurrencyChange()"
+        [showClear]="false"
+        [filter]="true"
+        filterBy="code"
+      >
+        <ng-template pTemplate="selectedItem" let-currency>
+          <span>{{ currency.code }}</span>
+        </ng-template>
+        <ng-template pTemplate="item" let-currency>
+          <span>{{ currency.code }} - {{ currency.name }}</span>
+        </ng-template>
+      </p-select>
+      <p-inputnumber
+        [(ngModel)]="amount"
+        inputId="currency-input"
+        mode="currency"
+        [currency]="selectedCurrency.code"
+        [locale]="selectedCurrency.locale"
+      />
+    </div>
+  </div>
+  <div class="flex items-center gap-4 mb-4">
+    <label for="category" class="font-semibold w-24">Category</label>
+    <p-select
+      [(ngModel)]="selectedCategory"
+      id="category"
+      [options]="expenseService.categories"
+      placeholder="Select Category"
+      [showClear]="true"
+      [filter]="true"
+      filterBy="name"
+      styleClass="flex-auto"
+      [virtualScroll]="true"
+      [virtualScrollItemSize]="24"
+      ariaLabel="Category"
+      (onFilter)="filterCallback($event)"
+    >
+      <ng-template pTemplate="selectedItem" let-category>
+        <span>{{ category.name }}</span>
+      </ng-template>
+      <ng-template pTemplate="item" let-category>
+        <span>{{ category.name }}</span>
+      </ng-template>
+      <ng-template #footer>
+        @if (showCreateCategory) {
+        <div class="p-3">
+          <p-button
+            label="Add Category {{ categoryFilterValue }}"
+            fluid
+            severity="secondary"
+            text
+            size="small"
+            icon="pi pi-plus"
+            (click)="createCategory(categoryFilterValue)"
+          />
+        </div>
+        }
+      </ng-template>
+    </p-select>
+  </div>
+  <div class="flex items-center gap-4 mb-4">
+    <label for="description" class="font-semibold w-24">Description</label>
+    <p-floatlabel variant="on">
+      <textarea
+        pTextarea
+        id="description"
+        [(ngModel)]="description"
+        rows="5"
+        cols="32"
+        style="resize: none"
+        class="h-full w-full"
+      ></textarea>
+      <label for="description">Description</label>
+    </p-floatlabel>
+  </div>
+  <div class="flex items-center gap-4 mb-16">
+    <label for="date" class="font-semibold w-24">Date</label>
+    <p-floatlabel variant="on">
+      <p-datepicker
+        [(ngModel)]="date"
+        inputId="date"
+        showIcon
+        iconDisplay="input"
+        styleClass="flex-auto"
+      />
+      <label for="date">Date</label>
+    </p-floatlabel>
+    <div class="flex-col">
+      <label for="isRecurring" class="block text-xs">Recurring?</label>
+      <p-toggleswitch id="isRecurring" [(ngModel)]="isRecurring" />
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-2">
+    <p-button label="Cancel" severity="secondary" (click)="visible = false" />
+    <p-button label="Create" (click)="saveExpense()" />
+  </div>
+</p-dialog>
