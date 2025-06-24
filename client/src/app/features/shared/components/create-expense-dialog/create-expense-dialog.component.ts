@@ -22,4 +22,8 @@ export class CreateExpenseDialogComponent {
       this.visible = true;
     }
 
+    onExpenseCreated() {
+      this.visible = false;
+    }
+
 }

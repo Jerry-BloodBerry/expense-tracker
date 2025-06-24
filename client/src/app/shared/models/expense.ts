@@ -10,3 +10,15 @@ export interface Expense {
   isRecurring: boolean;
   recurrenceInterval: string | null;
 }
+
+export interface CreateExpenseDto {
+  name: string;
+  amount: number;
+  categoryId: number;
+  tagIds: number[];
+  date: Date;
+  description: string | null;
+  currency: string;
+  isRecurring: boolean;
+  recurrenceInterval: string | null;
+}

@@ -25,6 +25,7 @@ export class DashboardComponent implements OnInit {
 
   initializeDashboard() {
     this.expenseService.getCategories();
+    this.expenseService.getTags();
     this.expenseQueryParams.page = 1;
     this.expenseQueryParams.pageSize = 5;
     this.getExpenses();

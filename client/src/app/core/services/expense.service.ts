@@ -6,6 +6,8 @@ import { ListResponse } from '../../shared/models/list-response';
 import { Expense } from '../../shared/models/expense';
 import { Pagination } from '../../shared/models/pagination';
 import { ExpenseQueryParams } from '../../shared/models/expenseQueryParams';
+import { CreateExpenseDto } from '../../shared/models/expense';
+import { Tag } from '../../shared/models/tag';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +16,7 @@ export class ExpenseService {
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
   categories: Category[] = [];
+  tags: Tag[] = [];
 
   getExpenses(queryParams: ExpenseQueryParams) {
     let params = new HttpParams();
@@ -56,5 +59,21 @@ export class ExpenseService {
       next: response => this.categories = response.data,
       error: error => console.log(error)
     })
+  }
+
+  getTags() {
+    if (this.tags.length > 0) return;
+    this.http.get<ListResponse<Tag>>(this.baseUrl + 'tags').subscribe({
+      next: response => this.tags = response.data,
+      error: error => console.log(error)
+    })
+  }
+
+  createExpense(expenseData: CreateExpenseDto) {
+    return this.http.post<Expense>(this.baseUrl + 'expenses', expenseData);
+  }
+
+  createTag(name: string) {
+    return this.http.post<Tag>(this.baseUrl + 'tags', { name });
   }
 }

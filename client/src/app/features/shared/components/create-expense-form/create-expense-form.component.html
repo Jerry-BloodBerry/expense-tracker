@@ -96,6 +96,44 @@
     </p-select>
   </div>
   <div class="flex items-center gap-4 mb-4">
+    <label for="tags" class="font-semibold w-24">Tags</label>
+    <p-multiselect
+      formControlName="tagIds"
+      display="chip"
+      [options]="expenseService.tags"
+      optionLabel="name"
+      optionValue="id"
+      placeholder="Select Tags"
+      [maxSelectedLabels]="2"
+      [showClear]="true"
+      [filter]="true"
+      (onFilter)="onTagFilter($event)"
+      class="flex-auto max-w-full"
+    >
+      <ng-template pTemplate="selectedItem" let-tagId>
+        <span>{{ getTagName(tagId) }}</span>
+      </ng-template>
+      <ng-template pTemplate="item" let-tag>
+        <span>{{ tag.name }}</span>
+      </ng-template>
+      <ng-template #footer>
+        @if (showCreateTag) {
+        <div class="p-3">
+          <p-button
+            label="Add Tag '{{ tagFilterValue }}'"
+            fluid
+            severity="secondary"
+            text
+            size="small"
+            icon="pi pi-plus"
+            (click)="createTag(tagFilterValue)"
+          />
+        </div>
+        }
+      </ng-template>
+    </p-multiselect>
+  </div>
+  <div class="flex items-center gap-4 mb-4">
     <label for="description" class="font-semibold w-24">Description</label>
     <p-floatlabel variant="on">
       <textarea

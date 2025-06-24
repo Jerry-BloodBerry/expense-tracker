@@ -14,5 +14,5 @@
   [dismissableMask]="true"
 >
   <span class="p-text-secondary block mb-8">Create new expense</span>
-  <app-create-expense-form />
+  <app-create-expense-form (expenseCreated)="onExpenseCreated()" />
 </p-dialog>
