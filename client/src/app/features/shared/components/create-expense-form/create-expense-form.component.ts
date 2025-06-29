@@ -47,6 +47,7 @@ export class CreateExpenseFormComponent implements OnInit {
   showCreateCategory: boolean = false;
 
   @Output() expenseCreated = new EventEmitter<Expense>();
+  @Output() cancelButtonClicked = new EventEmitter();
 
   get tags(): Tag[] { return this.expenseService.tags; }
   showCreateTag: boolean = false;
@@ -141,7 +142,7 @@ export class CreateExpenseFormComponent implements OnInit {
   }
 
   handleCancel(event: any) {
-    console.log("Cancel button clicked!");
+    this.cancelButtonClicked.emit();
   }
 
   get title() {

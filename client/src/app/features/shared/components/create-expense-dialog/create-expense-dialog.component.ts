@@ -26,4 +26,7 @@ export class CreateExpenseDialogComponent {
       this.visible = false;
     }
 
+    onCancelClicked() {
+      this.visible = false;
+    }
 }
