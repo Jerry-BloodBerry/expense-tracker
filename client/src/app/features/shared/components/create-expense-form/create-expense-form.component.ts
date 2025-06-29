@@ -13,9 +13,10 @@ import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { RippleModule } from 'primeng/ripple';
-import { Expense, CreateExpenseDto } from '../../../../shared/models/expense';
+import { Expense, CreateExpenseDto, RecurrenceInterval } from '../../../../shared/models/expense';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { Tag } from '../../../../shared/models/tag';
+import { SingleResponse } from '../../../../shared/models/single-response';
 
 @Component({
   selector: 'app-create-expense-form',
@@ -51,19 +52,26 @@ export class CreateExpenseFormComponent implements OnInit {
   showCreateTag: boolean = false;
   tagFilterValue: string = '';
 
+  recurrenceIntervals = Object.values(RecurrenceInterval);
+
   expenseForm = this.formBuilder.group({
     title: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(200)]],
-    category: [null as Category | null, [Validators.required]],
+    category: [null as number | null, [Validators.required]],
     description: ['', [Validators.maxLength(1000)]],
     currency: [null as Currency | null, [Validators.required]],
     amount: [0.00, [Validators.required, Validators.min(0)]],
     date: [null as Date | null, [Validators.required]],
     isRecurring: [false, [Validators.required]],
-    tagIds: this.formBuilder.control<number[]>([], [])
+    tagIds: this.formBuilder.control<number[]>([], []),
+    recurrenceInterval: [null]
   });
 
   ngOnInit(): void {
     this.loadLastUsedCurrency();
+    // Initially disable the control if not recurring
+    if (!this.expenseForm.get('isRecurring')!.value) {
+      this.expenseForm.get('recurrenceInterval')!.disable();
+    }
   }
 
   onSubmit() {
@@ -79,18 +87,18 @@ export class CreateExpenseFormComponent implements OnInit {
     const expenseDto: CreateExpenseDto = {
       name: formValue.title!,
       amount: formValue.amount!,
-      categoryId: formValue.category!.id,
+      categoryId: formValue.category!,
       tagIds: (formValue.tagIds ?? []) as number[],
       date: formValue.date!,
       description: formValue.description || null,
       currency: formValue.currency!.code,
       isRecurring: formValue.isRecurring!,
-      recurrenceInterval: null // TODO: Add recurrence interval support
+      recurrenceInterval: formValue.isRecurring ? (formValue.recurrenceInterval ?? null) : null
     };
 
     this.expenseService.createExpense(expenseDto).subscribe({
-      next: (createdExpense: Expense) => {
-        this.expenseCreated.emit(createdExpense);
+      next: (res: SingleResponse<Expense>) => {
+        this.expenseCreated.emit(res.data);
         this.expenseForm.reset();
         this.expenseForm.enable();
       },
@@ -102,8 +110,16 @@ export class CreateExpenseFormComponent implements OnInit {
   }
 
   createCategory(categoryName: string) {
-    // TODO: Implement category creation logic
-    console.log('Creating category:', categoryName);
+    this.expenseService.createCategory(categoryName).subscribe({
+      next: (res: SingleResponse<Category>) => {
+        this.expenseService.categories = [...this.expenseService.categories, res.data];
+        this.expenseForm.patchValue({ category: res.data.id });
+        this.showCreateCategory = false;
+      },
+      error: (err) => {
+        console.error('Failed to create tag:', err);
+      }
+    });
   }
 
   filterCallback(event: any) {
@@ -134,10 +150,10 @@ export class CreateExpenseFormComponent implements OnInit {
 
   createTag(tagName: string) {
     this.expenseService.createTag(tagName).subscribe({
-      next: (newTag: Tag) => {
-        this.expenseService.tags.push(newTag);
+      next: (res: SingleResponse<Tag>) => {
+        this.expenseService.tags = [...this.expenseService.tags, res.data];
         const current = this.expenseForm.value.tagIds ?? [];
-        this.expenseForm.patchValue({ tagIds: [...current, newTag.id] });
+        this.expenseForm.patchValue({ tagIds: [...current, res.data.id] });
         this.showCreateTag = false;
       },
       error: (err) => {

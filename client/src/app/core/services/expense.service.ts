@@ -8,6 +8,7 @@ import { Pagination } from '../../shared/models/pagination';
 import { ExpenseQueryParams } from '../../shared/models/expenseQueryParams';
 import { CreateExpenseDto } from '../../shared/models/expense';
 import { Tag } from '../../shared/models/tag';
+import { SingleResponse } from '../../shared/models/single-response';
 
 @Injectable({
   providedIn: 'root'
@@ -70,10 +71,14 @@ export class ExpenseService {
   }
 
   createExpense(expenseData: CreateExpenseDto) {
-    return this.http.post<Expense>(this.baseUrl + 'expenses', expenseData);
+    return this.http.post<SingleResponse<Expense>>(this.baseUrl + 'expenses', expenseData);
   }
 
   createTag(name: string) {
-    return this.http.post<Tag>(this.baseUrl + 'tags', { name });
+    return this.http.post<SingleResponse<Tag>>(this.baseUrl + 'tags', { name });
+  }
+
+  createCategory(name: string, description?: string) {
+    return this.http.post<SingleResponse<Category>>(this.baseUrl + 'categories', {name, description});
   }
 }

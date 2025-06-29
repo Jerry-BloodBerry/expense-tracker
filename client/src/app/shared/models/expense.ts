@@ -1,3 +1,11 @@
+export enum RecurrenceInterval {
+  Daily = 'Daily',
+  Weekly = 'Weekly',
+  Monthly = 'Monthly',
+  Quarterly = 'Quarterly',
+  Yearly = 'Yearly'
+}
+
 export interface Expense {
   id: number;
   name: string;
@@ -8,7 +16,7 @@ export interface Expense {
   description: string | null;
   currency: string;
   isRecurring: boolean;
-  recurrenceInterval: string | null;
+  recurrenceInterval: RecurrenceInterval | null;
 }
 
 export interface CreateExpenseDto {
@@ -20,5 +28,5 @@ export interface CreateExpenseDto {
   description: string | null;
   currency: string;
   isRecurring: boolean;
-  recurrenceInterval: string | null;
+  recurrenceInterval: RecurrenceInterval | null;
 }

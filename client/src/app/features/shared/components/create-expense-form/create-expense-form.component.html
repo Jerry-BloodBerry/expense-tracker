@@ -71,6 +71,8 @@
       [virtualScrollItemSize]="24"
       ariaLabel="Category"
       (onFilter)="filterCallback($event)"
+      optionValue="id"
+      optionLabel="name"
     >
       <ng-template pTemplate="selectedItem" let-category>
         <span>{{ category.name }}</span>
@@ -134,6 +136,23 @@
     </p-multiselect>
   </div>
   <div class="flex items-center gap-4 mb-4">
+    <label for="recurrence" class="font-semibold w-24">Recurrence</label>
+    <div class="flex items-center gap-4 flex-auto">
+      <p-toggleswitch id="isRecurring" formControlName="isRecurring" />
+      <p-select
+        formControlName="recurrenceInterval"
+        [options]="recurrenceIntervals"
+        [disabled]="!expenseForm.value.isRecurring"
+        placeholder="Select Interval"
+        class="flex-auto"
+      >
+        <ng-template pTemplate="item" let-interval>
+          <span>{{ interval }}</span>
+        </ng-template>
+      </p-select>
+    </div>
+  </div>
+  <div class="flex items-center gap-4 mb-4">
     <label for="description" class="font-semibold w-24">Description</label>
     <p-floatlabel variant="on">
       <textarea
@@ -148,22 +167,19 @@
       <label for="description">Description</label>
     </p-floatlabel>
   </div>
+
   <div class="flex items-center gap-4 mb-16">
     <label for="date" class="font-semibold w-24">Date</label>
-    <p-floatlabel variant="on">
+    <p-floatlabel variant="on" class="flex flex-auto">
       <p-datepicker
         formControlName="date"
         inputId="date"
         showIcon
         iconDisplay="input"
-        styleClass="flex-auto"
+        styleClass="flex-auto min-w-full"
       />
       <label for="date">Date</label>
     </p-floatlabel>
-    <div class="flex-col">
-      <label for="isRecurring" class="block text-xs">Recurring?</label>
-      <p-toggleswitch id="isRecurring" formControlName="isRecurring" />
-    </div>
   </div>
 
   <div class="flex justify-end gap-2">
