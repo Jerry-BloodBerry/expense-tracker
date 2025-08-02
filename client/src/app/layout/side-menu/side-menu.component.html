@@ -1,7 +1,11 @@
 <div class="card flex-col w-64 mt-4 h-[calc(100vh_-_150px)]">
   <p-menu [model]="items" styleClass="h-full">
     <ng-template #item let-item>
-      <a pRipple class="flex items-center p-menu-item-link">
+      <a
+        pRipple
+        class="flex items-center p-menu-item-link"
+        [routerLink]="item.routerLink"
+      >
         <span [class]="item.icon"></span>
         <span class="ml-2">{{ item.label }}</span>
         @if (item.badge) {

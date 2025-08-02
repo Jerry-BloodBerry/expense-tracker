@@ -15,14 +15,14 @@ public record GetAllExpensesRequest : PaginatedRequest
   [QueryParam]
   public int? CategoryId { get; init; }
 
-  private List<string> _tagIds = [];
+  private List<string>? _tagIds = [];
   [QueryParam]
-  public List<string> TagIds
+  public List<string>? TagIds
   {
     get => _tagIds;
     set
     {
-      _tagIds = value.SelectMany(x => x.Split(',', StringSplitOptions.RemoveEmptyEntries)).ToList();
+      _tagIds = value?.SelectMany(x => x.Split(',', StringSplitOptions.RemoveEmptyEntries)).ToList();
     }
   }
 

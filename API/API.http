@@ -1,6 +1,11 @@
 @API_HostAddress = http://localhost:5229
 
-GET {{API_HostAddress}}/weatherforecast/
+GET {{API_HostAddress}}/api/reports/expenses?startDate=2024-01-01&endDate=2024-01-31&currency=USD
+Accept: application/json
+
+###
+
+GET {{API_HostAddress}}/api/reports/expenses?startDate=2024-01-01&endDate=2024-01-31&currency=USD&tagIds=1,2&categoryIds=1
 Accept: application/json
 
 ###
