@@ -1,0 +1,63 @@
+<form>
+  <div class="flex flex-row space-x-4">
+    <p-float-label variant="on">
+      <p-datepicker
+        name="dateRange"
+        inputId="dateRangeInput"
+        [(ngModel)]="rangeDates"
+        selectionMode="range"
+        [readonlyInput]="true"
+        placeholder="Select date range"
+        [iconDisplay]="'input'"
+        [showIcon]="true"
+        dateFormat="dd.mm.yy"
+        ariaLabel="Date range"
+        [showButtonBar]="true"
+        (onSelect)="onDateRangeUpdate()"
+      />
+      <label for="dateRangeInput">Date Range</label>
+    </p-float-label>
+    <app-button-filter title="Category" label="Category" icon="pi pi-folder">
+      <p-autocomplete
+        name="categorySearch"
+        [(ngModel)]="categorySearch"
+        [suggestions]="categories ?? []"
+        (completeMethod)="filterCategories($event)"
+        styleClass="flex w-full"
+        inputStyleClass="w-full"
+        placeholder="Search categories..."
+      />
+      <div class="flex flex-col gap-4 mt-3">
+        @for (cat of filteredCategories?.slice(0, 5); track $index) {
+        <ng-template
+          #catTemplate
+          [ngTemplateOutlet]="catTemplate"
+          let-catDisplay
+          [ngTemplateOutletContext]="{
+            $implicit: getCategoryDisplay(cat.id, categories ?? [])
+          }"
+        >
+          <div class="flex items-center">
+            <p-checkbox
+              [inputId]="'cat_' + cat.id.toString()"
+              name="group"
+              [value]="cat"
+              [(ngModel)]="selectedCategories"
+            />
+            <label
+              [for]="'cat_' + cat.id.toString()"
+              class="ml-2 flex items-center"
+            >
+              <div
+                class="inline-block w-2 h-2 rounded-full mr-2 mt-1"
+                [ngStyle]="{ 'background-color': catDisplay.color }"
+              ></div>
+              {{ catDisplay.name }}
+            </label>
+          </div>
+        </ng-template>
+        }
+      </div>
+    </app-button-filter>
+  </div>
+</form>

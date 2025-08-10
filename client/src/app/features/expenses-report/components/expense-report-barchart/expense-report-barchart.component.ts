@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { ChartModule } from 'primeng/chart';
-import { ChangeDetectorRef, Component, inject, input, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, input, OnChanges, PLATFORM_ID, SimpleChanges } from '@angular/core';
 import { DateRange } from '../../../../shared/types/date-range';
 import { ExpenseReportService } from '../../../../core/services/expense-report.service';
 import { ExpenseReport } from '../../../../shared/models/expense-report';
@@ -14,7 +14,7 @@ import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pip
   templateUrl: './expense-report-barchart.component.html',
   styleUrl: './expense-report-barchart.component.scss'
 })
-export class ExpenseReportBarchartComponent {
+export class ExpenseReportBarchartComponent implements OnChanges {
     public dateRange = input.required<DateRange>();
     public currency = input.required<string>();
 
@@ -28,6 +28,10 @@ export class ExpenseReportBarchartComponent {
       private expenseReportService: ExpenseReportService,
       private currencyPipe: FormatCurrencyPipe
     ) {}
+
+    ngOnChanges(changes: SimpleChanges): void {
+      this.fetchExpensesChartData(this.dateRange(), this.currency());
+    }
 
     ngOnInit() {
         this.fetchExpensesChartData(this.dateRange(), this.currency());
@@ -45,7 +49,6 @@ export class ExpenseReportBarchartComponent {
             const documentStyle = getComputedStyle(document.documentElement);
             const textColor = documentStyle.getPropertyValue('--p-text-color');
             const textColorSecondary = documentStyle.getPropertyValue('--p-text-muted-color');
-            console.log(this.expensesReport?.dataPoints.map(expense => expense.amount));
 
             this.data = {
                 labels: this.expensesReport?.dataPoints.map(expense => format(expense.date, 'dd/MM/yyyy')) ?? [],

@@ -1,0 +1,22 @@
+<p-button
+  (click)="toggleVisibility()"
+  [label]="label()"
+  [icon]="icon()"
+  severity="contrast"
+/>
+<p-overlay
+  [style]="{ width: '20rem' }"
+  [(visible)]="visible"
+  contentStyleClass="p-4 mt-3 bg-white shadow rounded-lg border-gray-200"
+  [baseZIndex]="1000"
+>
+  <div class="flex flex-col gap-4">
+    <div>
+      <span class="text-md font-bold block mb-2">{{ title() }}</span>
+      <ng-content></ng-content>
+      <button pButton pRipple class="w-full mt-6" severity="success">
+        Apply
+      </button>
+    </div>
+  </div>
+</p-overlay>
