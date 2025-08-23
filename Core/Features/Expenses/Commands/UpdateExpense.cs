@@ -17,7 +17,7 @@ public record UpdateExpenseCommand : IRequest<ErrorOr<ExpenseDto>>
   public string? Description { get; init; }
   public required string Currency { get; init; }
   public bool IsRecurring { get; init; }
-  public RecurrenceInterval? RecurrenceInterval { get; init; }
+  public string? RecurrenceInterval { get; init; }
   public List<int> TagIds { get; init; } = [];
 }
 
@@ -53,9 +53,13 @@ public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ErrorO
       expense.UpdateAmount(request.Amount);
       expense.SetDescription(request.Description);
 
-      if (request.IsRecurring && request.RecurrenceInterval.HasValue)
+      if (request.IsRecurring && !string.IsNullOrEmpty(request.RecurrenceInterval))
       {
-        expense.SetAsRecurring(request.RecurrenceInterval.Value);
+        if (!Enum.TryParse<RecurrenceInterval>(request.RecurrenceInterval, out var recurrenceInterval))
+        {
+          return ExpenseErrors.InvalidRecurrenceInterval(request.RecurrenceInterval);
+        }
+        expense.SetAsRecurring(recurrenceInterval);
       }
       else
       {
