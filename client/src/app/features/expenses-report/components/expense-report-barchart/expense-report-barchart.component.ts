@@ -6,6 +6,7 @@ import { ExpenseReportService } from '../../../../core/services/expense-report.s
 import { ExpenseReport } from '../../../../shared/models/expense-report';
 import { format } from 'date-fns';
 import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
+import { ExpenseReportFilters } from '../../expenses-report.dtos';
 
 @Component({
   selector: 'app-expense-report-barchart',
@@ -15,7 +16,7 @@ import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pip
   styleUrl: './expense-report-barchart.component.scss'
 })
 export class ExpenseReportBarchartComponent implements OnChanges {
-    public dateRange = input.required<DateRange>();
+    public filters = input.required<ExpenseReportFilters>();
     public currency = input.required<string>();
 
     expensesReport?: ExpenseReport;
@@ -30,15 +31,18 @@ export class ExpenseReportBarchartComponent implements OnChanges {
     ) {}
 
     ngOnChanges(changes: SimpleChanges): void {
-      this.fetchExpensesChartData(this.dateRange(), this.currency());
+      this.fetchExpensesChartData(this.filters(), this.currency());
     }
 
     ngOnInit() {
-        this.fetchExpensesChartData(this.dateRange(), this.currency());
+        this.fetchExpensesChartData(this.filters(), this.currency());
     }
 
-    fetchExpensesChartData(dateRange: DateRange, currency: string) {
-      this.expenseReportService.getExpenseReport(dateRange.startDate!, dateRange.endDate!, currency, undefined, undefined).subscribe((response) => {
+    fetchExpensesChartData(filters: ExpenseReportFilters, currency: string) {
+      if (!filters.dateRange?.startDate || !filters.dateRange?.endDate) {
+        return;
+      }
+      this.expenseReportService.getExpenseReport(filters, currency).subscribe((response) => {
         this.expensesReport = response.data;
         this.initChart();
       });

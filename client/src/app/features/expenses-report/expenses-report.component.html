@@ -1,10 +1,10 @@
 <div class="card">
   <app-expenses-report-header
     [initialDateRange]="[initialStartDate, initialEndDate]"
-    (dateRangeUpdated)="onDateRangeUpdate($event)"
+    (filtersChange)="onFiltersChange($event)"
   />
   <app-expense-report-barchart
     [currency]="reportCurrency"
-    [dateRange]="reportDateRange"
+    [filters]="reportFilters"
   />
 </div>

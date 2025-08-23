@@ -1,4 +1,4 @@
-import { Component} from '@angular/core';
+import { Component, EventEmitter, Output} from '@angular/core';
 import { Dialog } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
@@ -17,6 +17,7 @@ import { CreateExpenseFormComponent } from "../create-expense-form/create-expens
 })
 export class CreateExpenseDialogComponent {
     visible: boolean = false;
+    @Output() expenseCreated = new EventEmitter<void>();
 
     showDialog() {
       this.visible = true;
@@ -24,6 +25,7 @@ export class CreateExpenseDialogComponent {
 
     onExpenseCreated() {
       this.visible = false;
+      this.expenseCreated.emit();
     }
 
     onCancelClicked() {

@@ -14,7 +14,13 @@
     <div>
       <span class="text-md font-bold block mb-2">{{ title() }}</span>
       <ng-content></ng-content>
-      <button pButton pRipple class="w-full mt-6" severity="success">
+      <button
+        pButton
+        pRipple
+        class="w-full mt-6"
+        severity="success"
+        (click)="onApply()"
+      >
         Apply
       </button>
     </div>

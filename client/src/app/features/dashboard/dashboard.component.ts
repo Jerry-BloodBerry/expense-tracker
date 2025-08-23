@@ -7,6 +7,9 @@ import { Pagination } from '../../shared/models/pagination';
 import { ExpenseQueryParams } from '../../shared/models/expenseQueryParams';
 import { ExpenseSummaryCardComponent } from "./components/expense-summary-card/expense-summary-card.component";
 import { FormatCurrencyPipe } from '../../shared/pipes/format-currency.pipe';
+import { ExpenseCategoriesService } from '../../core/services/expense-categories.service';
+import { Observable } from 'rxjs';
+import { Category } from '../../shared/models/category';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,26 +19,21 @@ import { FormatCurrencyPipe } from '../../shared/pipes/format-currency.pipe';
 })
 export class DashboardComponent implements OnInit {
   expenseService = inject(ExpenseService);
-  expenseQueryParams = new ExpenseQueryParams();
+  expenseCategoriesService = inject(ExpenseCategoriesService);
   expenses?: Pagination<Expense>;
+  categories$: Observable<Category[]>;
+
+  constructor() {
+    this.categories$ = this.expenseCategoriesService.getCategories();
+  }
 
   ngOnInit(): void {
     this.initializeDashboard();
   }
 
   initializeDashboard() {
-    this.expenseService.getCategories();
+    this.expenseCategoriesService.getCategories().subscribe();
     this.expenseService.getTags();
-    this.expenseQueryParams.page = 1;
-    this.expenseQueryParams.pageSize = 5;
-    this.getExpenses();
-  }
-
-  getExpenses() {
-    this.expenseService.getExpenses(this.expenseQueryParams).subscribe({
-      next: response => this.expenses = response,
-      error: error => console.log(error)
-    })
   }
 
 }

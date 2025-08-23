@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, EventEmitter, input, Output } from '@angular/core';
 import { Button, ButtonModule } from "primeng/button";
 import { Overlay } from 'primeng/overlay';
 import { RippleModule } from 'primeng/ripple';
@@ -15,8 +15,13 @@ export class ButtonFilterComponent {
   public label = input.required<string>();
   public icon = input<string>();
 
+  @Output() applyClick = new EventEmitter<void>();
 
   toggleVisibility(): void {
     this.visible = !this.visible;
+  }
+
+  onApply(): void {
+    this.applyClick.emit();
   }
 }

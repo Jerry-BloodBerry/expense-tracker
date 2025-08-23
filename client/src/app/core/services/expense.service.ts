@@ -16,7 +16,6 @@ import { SingleResponse } from '../../shared/models/single-response';
 export class ExpenseService {
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
-  categories: Category[] = [];
   tags: Tag[] = [];
 
   getExpenses(queryParams: ExpenseQueryParams) {
@@ -54,14 +53,6 @@ export class ExpenseService {
     return this.http.get<Pagination<Expense>>(this.baseUrl + 'expenses', {params});
   }
 
-  getCategories() {
-    if (this.categories.length > 0) return;
-    this.http.get<ListResponse<Category>>(this.baseUrl + 'categories').subscribe({
-      next: response => this.categories = response.data,
-      error: error => console.log(error)
-    })
-  }
-
   getTags() {
     if (this.tags.length > 0) return;
     this.http.get<ListResponse<Tag>>(this.baseUrl + 'tags').subscribe({
@@ -76,9 +67,5 @@ export class ExpenseService {
 
   createTag(name: string) {
     return this.http.post<SingleResponse<Tag>>(this.baseUrl + 'tags', { name });
-  }
-
-  createCategory(name: string, description?: string) {
-    return this.http.post<SingleResponse<Category>>(this.baseUrl + 'categories', {name, description});
   }
 }

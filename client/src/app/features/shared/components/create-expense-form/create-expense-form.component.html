@@ -61,7 +61,7 @@
     <p-select
       formControlName="category"
       id="category"
-      [options]="expenseService.categories"
+      [options]="(categories$ | async) ?? undefined"
       placeholder="Select Category"
       [showClear]="true"
       [filter]="true"
@@ -142,7 +142,6 @@
       <p-select
         formControlName="recurrenceInterval"
         [options]="recurrenceIntervals"
-        [disabled]="!expenseForm.value.isRecurring"
         placeholder="Select Interval"
         class="flex-auto"
       >

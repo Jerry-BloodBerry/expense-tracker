@@ -17,6 +17,9 @@ import { Expense, CreateExpenseDto, RecurrenceInterval } from '../../../../share
 import { MultiSelectModule } from 'primeng/multiselect';
 import { Tag } from '../../../../shared/models/tag';
 import { SingleResponse } from '../../../../shared/models/single-response';
+import { ExpenseCategoriesService } from '../../../../core/services/expense-categories.service';
+import { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-create-expense-form',
@@ -33,6 +36,7 @@ import { SingleResponse } from '../../../../shared/models/single-response';
     TextareaModule,
     ToggleSwitch,
     MultiSelectModule,
+    AsyncPipe
   ],
   templateUrl: './create-expense-form.component.html',
   styleUrl: './create-expense-form.component.scss'
@@ -40,14 +44,20 @@ import { SingleResponse } from '../../../../shared/models/single-response';
 export class CreateExpenseFormComponent implements OnInit {
   private formBuilder = inject(NonNullableFormBuilder);
   private localStorageService = inject(LocalStorageService);
-  expenseService = inject(ExpenseService);
-  currencies = CURRENCIES;
+  protected expenseService = inject(ExpenseService);
+  protected currencies = CURRENCIES;
+  protected expenseCategoriesService = inject(ExpenseCategoriesService);
+  protected categories$: Observable<Category[]>;
 
   categoryFilterValue: string = '';
   showCreateCategory: boolean = false;
 
   @Output() expenseCreated = new EventEmitter<Expense>();
   @Output() cancelButtonClicked = new EventEmitter();
+
+  constructor() {
+    this.categories$ = this.expenseCategoriesService.getCategories();
+  }
 
   get tags(): Tag[] { return this.expenseService.tags; }
   showCreateTag: boolean = false;
@@ -73,6 +83,14 @@ export class CreateExpenseFormComponent implements OnInit {
     if (!this.expenseForm.get('isRecurring')!.value) {
       this.expenseForm.get('recurrenceInterval')!.disable();
     }
+    this.expenseForm.controls.isRecurring.valueChanges.subscribe((checked) => {
+      if (!checked) {
+        this.expenseForm.controls.recurrenceInterval.setValue(null);
+        this.expenseForm.controls.recurrenceInterval.disable();
+      } else {
+        this.expenseForm.controls.recurrenceInterval.enable();
+      }
+    })
   }
 
   onSubmit() {
@@ -80,8 +98,6 @@ export class CreateExpenseFormComponent implements OnInit {
       this.expenseForm.markAllAsTouched();
       return;
     }
-
-    this.expenseForm.disable();
 
     // Map form values to the expected DTO for the backend
     const formValue = this.expenseForm.value;
@@ -101,7 +117,6 @@ export class CreateExpenseFormComponent implements OnInit {
       next: (res: SingleResponse<Expense>) => {
         this.expenseCreated.emit(res.data);
         this.expenseForm.reset();
-        this.expenseForm.enable();
       },
       error: (err: unknown) => {
         console.error('Failed to create expense:', err);
@@ -111,10 +126,10 @@ export class CreateExpenseFormComponent implements OnInit {
   }
 
   createCategory(categoryName: string) {
-    this.expenseService.createCategory(categoryName).subscribe({
-      next: (res: SingleResponse<Category>) => {
-        this.expenseService.categories = [...this.expenseService.categories, res.data];
-        this.expenseForm.patchValue({ category: res.data.id });
+    this.expenseCategoriesService.createCategory(categoryName).subscribe({
+      next: (res: Category) => {
+        this.categories$ = this.expenseCategoriesService.getCategories(); // trigger the refresh
+        this.expenseForm.patchValue({ category: res.id });
         this.showCreateCategory = false;
       },
       error: (err) => {
@@ -125,7 +140,7 @@ export class CreateExpenseFormComponent implements OnInit {
 
   filterCallback(event: any) {
     this.categoryFilterValue = event.filter;
-    this.showCreateCategory = !this.expenseService.categories.some(
+    this.showCreateCategory = !this.expenseCategoriesService.categories.some(
       cat => cat.name.toLowerCase().startsWith(this.categoryFilterValue.toLowerCase())
     );
   }

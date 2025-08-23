@@ -1,4 +1,4 @@
 export interface DateRange {
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate: Date | null | undefined;
+  endDate: Date | null | undefined;
 }

@@ -17,7 +17,12 @@
       />
       <label for="dateRangeInput">Date Range</label>
     </p-float-label>
-    <app-button-filter title="Category" label="Category" icon="pi pi-folder">
+    <app-button-filter
+      title="Category"
+      label="Category"
+      icon="pi pi-folder"
+      (applyClick)="onCategoriesFilter()"
+    >
       <p-autocomplete
         name="categorySearch"
         [(ngModel)]="categorySearch"

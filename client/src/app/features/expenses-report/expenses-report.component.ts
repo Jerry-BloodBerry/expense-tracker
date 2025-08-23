@@ -6,6 +6,7 @@ import { ExpenseReportBarchartComponent } from './components/expense-report-barc
 import { DateRange } from '../../shared/types/date-range';
 import { startOfMonth, endOfMonth, addMonths } from 'date-fns';
 import { ExpensesReportHeaderComponent } from './components/expenses-report-header/expenses-report-header.component';
+import { ExpenseReportFilters } from './expenses-report.dtos';
 
 @Component({
   selector: 'app-expenses-report',
@@ -14,13 +15,20 @@ import { ExpensesReportHeaderComponent } from './components/expenses-report-head
   styleUrl: './expenses-report.component.scss'
 })
 export class ExpensesReportComponent {
-  public initialStartDate = startOfMonth(addMonths(new Date(), -2));
-  public initialEndDate = endOfMonth(addMonths(new Date(), -1));
-  public reportDateRange: DateRange = {startDate: this.initialStartDate, endDate: this.initialEndDate}
-  public reportCurrency: string = 'PLN';
+  protected initialStartDate = startOfMonth(addMonths(new Date(), -2));
+  protected initialEndDate = endOfMonth(addMonths(new Date(), -1));
+  protected reportDateRange: DateRange = {startDate: this.initialStartDate, endDate: this.initialEndDate}
+  protected reportCurrency: string = 'PLN';
+  protected reportFilters: ExpenseReportFilters;
 
-  onDateRangeUpdate(event: DateRange)
-  {
-    this.reportDateRange = event;
+  constructor() {
+    this.reportFilters = {
+      dateRange: this.reportDateRange,
+      categories: undefined
+    }
+  }
+
+  onFiltersChange(filters: ExpenseReportFilters) {
+    this.reportFilters = filters;
   }
 }
