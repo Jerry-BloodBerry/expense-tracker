@@ -20,6 +20,7 @@ import { SingleResponse } from '../../../../shared/models/single-response';
 import { ExpenseCategoriesService } from '../../../../core/services/expense-categories.service';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import { ExpenseTagsService } from '../../../../core/services/expense-tags.service';
 
 @Component({
   selector: 'app-create-expense-form',
@@ -46,8 +47,10 @@ export class CreateExpenseFormComponent implements OnInit {
   private localStorageService = inject(LocalStorageService);
   protected expenseService = inject(ExpenseService);
   protected currencies = CURRENCIES;
-  protected expenseCategoriesService = inject(ExpenseCategoriesService);
+  private expenseCategoriesService = inject(ExpenseCategoriesService);
+  private expenseTagsService = inject(ExpenseTagsService);
   protected categories$: Observable<Category[]>;
+  protected tags$: Observable<Tag[]>;
 
   categoryFilterValue: string = '';
   showCreateCategory: boolean = false;
@@ -57,9 +60,9 @@ export class CreateExpenseFormComponent implements OnInit {
 
   constructor() {
     this.categories$ = this.expenseCategoriesService.getCategories();
+    this.tags$ = this.expenseTagsService.getTags();
   }
 
-  get tags(): Tag[] { return this.expenseService.tags; }
   showCreateTag: boolean = false;
   tagFilterValue: string = '';
 
@@ -128,7 +131,7 @@ export class CreateExpenseFormComponent implements OnInit {
   createCategory(categoryName: string) {
     this.expenseCategoriesService.createCategory(categoryName).subscribe({
       next: (res: Category) => {
-        this.categories$ = this.expenseCategoriesService.getCategories(); // trigger the refresh
+        this.categories$ = this.expenseCategoriesService.getCategories();
         this.expenseForm.patchValue({ category: res.id });
         this.showCreateCategory = false;
       },
@@ -165,11 +168,11 @@ export class CreateExpenseFormComponent implements OnInit {
   }
 
   createTag(tagName: string) {
-    this.expenseService.createTag(tagName).subscribe({
-      next: (res: SingleResponse<Tag>) => {
-        this.expenseService.tags = [...this.expenseService.tags, res.data];
+    this.expenseTagsService.createTag(tagName).subscribe({
+      next: (res: Tag) => {
+        this.tags$ = this.expenseTagsService.getTags();
         const current = this.expenseForm.value.tagIds ?? [];
-        this.expenseForm.patchValue({ tagIds: [...current, res.data.id] });
+        this.expenseForm.patchValue({ tagIds: [...current, res.id] });
         this.showCreateTag = false;
       },
       error: (err) => {
@@ -180,13 +183,13 @@ export class CreateExpenseFormComponent implements OnInit {
 
   onTagFilter(event: any) {
     this.tagFilterValue = event.filter;
-    this.showCreateTag = !this.tags.some(
+    this.showCreateTag = !this.expenseTagsService.tags.some(
       tag => tag.name.toLowerCase() === this.tagFilterValue.toLowerCase()
     ) && this.tagFilterValue.length > 0;
   }
 
   getTagName(tagId: number): string {
-    const tag = this.tags.find(t => t.id === tagId);
+    const tag = this.expenseTagsService.tags.find(t => t.id === tagId);
     return tag ? tag.name : '';
   }
 }

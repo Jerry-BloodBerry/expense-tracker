@@ -7,10 +7,11 @@ import { DateRange } from '../../shared/types/date-range';
 import { startOfMonth, endOfMonth, addMonths } from 'date-fns';
 import { ExpensesReportHeaderComponent } from './components/expenses-report-header/expenses-report-header.component';
 import { ExpenseReportFilters } from './expenses-report.dtos';
+import { ExpenseReportPiechartComponent } from "./components/expense-report-piechart/expense-report-piechart.component";
 
 @Component({
   selector: 'app-expenses-report',
-  imports: [TabsModule, RouterModule, CommonModule, ExpenseReportBarchartComponent, ExpensesReportHeaderComponent],
+  imports: [TabsModule, RouterModule, CommonModule, ExpenseReportBarchartComponent, ExpensesReportHeaderComponent, ExpenseReportPiechartComponent],
   templateUrl: './expenses-report.component.html',
   styleUrl: './expenses-report.component.scss'
 })

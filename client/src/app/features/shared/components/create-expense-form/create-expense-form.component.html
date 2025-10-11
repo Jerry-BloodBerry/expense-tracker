@@ -102,7 +102,7 @@
     <p-multiselect
       formControlName="tagIds"
       display="chip"
-      [options]="expenseService.tags"
+      [options]="(tags$ | async) ?? undefined"
       optionLabel="name"
       optionValue="id"
       placeholder="Select Tags"

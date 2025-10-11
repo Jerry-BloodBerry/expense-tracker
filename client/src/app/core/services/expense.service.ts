@@ -1,14 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { Category } from '../../shared/models/category';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { ListResponse } from '../../shared/models/list-response';
 import { Expense } from '../../shared/models/expense';
 import { Pagination } from '../../shared/models/pagination';
 import { ExpenseQueryParams } from '../../shared/models/expenseQueryParams';
 import { CreateExpenseDto } from '../../shared/models/expense';
-import { Tag } from '../../shared/models/tag';
 import { SingleResponse } from '../../shared/models/single-response';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,9 +14,8 @@ import { SingleResponse } from '../../shared/models/single-response';
 export class ExpenseService {
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
-  tags: Tag[] = [];
 
-  getExpenses(queryParams: ExpenseQueryParams) {
+  getExpenses(queryParams: ExpenseQueryParams): Observable<Pagination<Expense>> {
     let params = new HttpParams();
 
     if (queryParams.startDate && queryParams.startDate.length) {
@@ -53,19 +50,8 @@ export class ExpenseService {
     return this.http.get<Pagination<Expense>>(this.baseUrl + 'expenses', {params});
   }
 
-  getTags() {
-    if (this.tags.length > 0) return;
-    this.http.get<ListResponse<Tag>>(this.baseUrl + 'tags').subscribe({
-      next: response => this.tags = response.data,
-      error: error => console.log(error)
-    })
-  }
-
   createExpense(expenseData: CreateExpenseDto) {
     return this.http.post<SingleResponse<Expense>>(this.baseUrl + 'expenses', expenseData);
   }
 
-  createTag(name: string) {
-    return this.http.post<SingleResponse<Tag>>(this.baseUrl + 'tags', { name });
-  }
 }
