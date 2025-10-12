@@ -17,6 +17,20 @@
       />
       <label for="dateRangeInput">Date Range</label>
     </p-float-label>
+    <p-select
+      name="currency"
+      inputId="currencyInput"
+      [(ngModel)]="selectedCurrency"
+      [options]="currencies"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Select currency"
+      ariaLabel="Currency"
+      [filter]="true"
+      filterPlaceholder="Search currencies..."
+      [showClear]="false"
+      (onChange)="onCurrencyChange()"
+    />
     <app-button-filter
       title="Category"
       label="Category"

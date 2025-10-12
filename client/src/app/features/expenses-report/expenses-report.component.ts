@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TabsModule } from 'primeng/tabs';
@@ -8,6 +8,7 @@ import { startOfMonth, endOfMonth, addMonths } from 'date-fns';
 import { ExpensesReportHeaderComponent } from './components/expenses-report-header/expenses-report-header.component';
 import { ExpenseReportFilters } from './expenses-report.dtos';
 import { ExpenseReportPiechartComponent } from "./components/expense-report-piechart/expense-report-piechart.component";
+import { ExpensesReportFacadeService } from './expenses-report-facade.service';
 
 @Component({
   selector: 'app-expenses-report',
@@ -16,20 +17,13 @@ import { ExpenseReportPiechartComponent } from "./components/expense-report-piec
   styleUrl: './expenses-report.component.scss'
 })
 export class ExpensesReportComponent {
-  protected initialStartDate = startOfMonth(addMonths(new Date(), -2));
-  protected initialEndDate = endOfMonth(addMonths(new Date(), -1));
-  protected reportDateRange: DateRange = {startDate: this.initialStartDate, endDate: this.initialEndDate}
-  protected reportCurrency: string = 'PLN';
-  protected reportFilters: ExpenseReportFilters;
+  private facadeService = inject(ExpensesReportFacadeService);
 
-  constructor() {
-    this.reportFilters = {
-      dateRange: this.reportDateRange,
-      categories: undefined
-    }
-  }
+  protected filters = this.facadeService.filters;
+  protected expensesData = this.facadeService.expensesData;
+  protected categorySummaryData = this.facadeService.categorySummaryData;
 
   onFiltersChange(filters: ExpenseReportFilters) {
-    this.reportFilters = filters;
+    this.facadeService.updateFilters(filters);
   }
 }

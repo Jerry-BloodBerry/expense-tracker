@@ -29,12 +29,11 @@ export class ExpenseReportService {
     if (filters.categories && filters.categories.length) {
       params = params.append('categoryIds', filters.categories.map(c => c.id).join(','));
     }
+    if (filters.tags && filters.tags.length) {
+      params = params.append('tagIds', filters.tags.map(t => t.id).join(','));
+    }
 
     params = params.append('currency', currency);
-
-    // if (tagIds && tagIds.length > 0) {
-    //   params = params.append('tagIds', tagIds.join(','));
-    // }
 
     return this.http.get<SingleResponse<ExpenseReport>>(this.baseUrl + 'reports/expenses', { params });
   }
@@ -52,6 +51,9 @@ export class ExpenseReportService {
     }
     if (filters.categories && filters.categories.length) {
       params = params.append('categoryIds', filters.categories.map(c => c.id).join(','));
+    }
+    if (filters.tags && filters.tags.length) {
+      params = params.append('tagIds', filters.tags.map(t => t.id).join(','));
     }
 
     params = params.append('currency', currency);

@@ -1,49 +1,36 @@
 import { isPlatformBrowser } from '@angular/common';
 import { ChartModule } from 'primeng/chart';
-import { ChangeDetectorRef, Component, inject, input, OnChanges, OnInit, PLATFORM_ID, SimpleChanges } from '@angular/core';
-import { ExpenseReportService } from '../../../../core/services/expense-report.service';
+import { ChangeDetectorRef, Component, inject, input, OnInit, PLATFORM_ID, effect } from '@angular/core';
 import { ExpenseCategorySummary } from '../../../../shared/models/category-summary';
 import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
-import { ExpenseReportFilters } from '../../expenses-report.dtos';
 
 @Component({
   selector: 'app-expense-report-piechart',
   imports: [ChartModule],
   providers: [FormatCurrencyPipe],
-  templateUrl: './expense-report-piechart.component.html',
-  styleUrl: './expense-report-piechart.component.scss'
+  templateUrl: './expense-report-piechart.component.html'
 })
-export class ExpenseReportPiechartComponent implements OnInit, OnChanges {
-    public filters = input.required<ExpenseReportFilters>();
+export class ExpenseReportPiechartComponent implements OnInit {
+    public categorySummaryData = input.required<ExpenseCategorySummary>();
     public currency = input.required<string>();
 
-    categorySummary?: ExpenseCategorySummary;
     data: any;
     options: any;
     platformId = inject(PLATFORM_ID);
 
     constructor(
       private cd: ChangeDetectorRef,
-      private expenseReportService: ExpenseReportService,
       private currencyPipe: FormatCurrencyPipe
-    ) {}
-
-    ngOnChanges(changes: SimpleChanges): void {
-      this.fetchCategorySummaryData(this.filters(), this.currency());
+    ) {
+      // React to changes in the category summary data
+      effect(() => {
+        this.initChart();
+      });
     }
 
     ngOnInit() {
-        this.fetchCategorySummaryData(this.filters(), this.currency());
-    }
-
-    fetchCategorySummaryData(filters: ExpenseReportFilters, currency: string) {
-      if (!filters.dateRange?.startDate || !filters.dateRange?.endDate) {
-        return;
-      }
-      this.expenseReportService.getExpenseCategorySummary(filters, currency).subscribe((response) => {
-        this.categorySummary = response.data;
-        this.initChart();
-      });
+      // Initialize chart if data is already available
+      this.initChart();
     }
 
     initChart() {
@@ -65,12 +52,12 @@ export class ExpenseReportPiechartComponent implements OnInit, OnChanges {
             ];
 
             this.data = {
-                labels: this.categorySummary?.dataPoints.map(category => category.categoryName) ?? [],
+                labels: this.categorySummaryData()?.dataPoints.map(category => category.categoryName) ?? [],
                 datasets: [
                     {
-                        data: this.categorySummary?.dataPoints.map(category => category.totalAmount) ?? [],
-                        backgroundColor: colors.slice(0, this.categorySummary?.dataPoints.length ?? 0),
-                        hoverBackgroundColor: colors.slice(0, this.categorySummary?.dataPoints.length ?? 0)
+                        data: this.categorySummaryData()?.dataPoints.map(category => category.totalAmount) ?? [],
+                        backgroundColor: colors.slice(0, this.categorySummaryData()?.dataPoints.length ?? 0),
+                        hoverBackgroundColor: colors.slice(0, this.categorySummaryData()?.dataPoints.length ?? 0)
                     }
                 ]
             };
@@ -89,7 +76,7 @@ export class ExpenseReportPiechartComponent implements OnInit, OnChanges {
                     tooltip: {
                         callbacks: {
                             label: (context: any) => {
-                                const category = this.categorySummary?.dataPoints[context.dataIndex];
+                                const category = this.categorySummaryData()?.dataPoints[context.dataIndex];
                                 const percentage = ((context.parsed / this.getTotalAmount()) * 100).toFixed(1);
                                 return `${category?.categoryName}: ${this.currencyPipe.transform(category?.totalAmount ?? 0, this.currency())} (${percentage}%)`;
                             }
@@ -102,6 +89,6 @@ export class ExpenseReportPiechartComponent implements OnInit, OnChanges {
     }
 
     private getTotalAmount(): number {
-        return this.categorySummary?.dataPoints.reduce((sum, category) => sum + category.totalAmount, 0) ?? 0;
+        return this.categorySummaryData()?.dataPoints.reduce((sum, category) => sum + category.totalAmount, 0) ?? 0;
     }
 }

@@ -1,22 +1,26 @@
 <div class="card w-full">
   <h1 class="text-2xl font-bold mb-4">Reporting</h1>
   <app-expenses-report-header
-    [initialDateRange]="[initialStartDate, initialEndDate]"
+    [initialDateRange]="[
+      filters().dateRange?.startDate!,
+      filters().dateRange?.endDate!
+    ]"
+    [initialCurrency]="filters().currency!"
     (filtersChange)="onFiltersChange($event)"
   />
   <div class="grid grid-cols-3 gap-4 items-start w-full">
     <div class="shadow-2xl rounded-lg p-4 col-span-2">
       <h2 class="text-lg font-bold mb-4">Expenses in selected period</h2>
       <app-expense-report-barchart
-        [currency]="reportCurrency"
-        [filters]="reportFilters"
+        [currency]="filters().currency!"
+        [expensesData]="expensesData()"
       />
     </div>
     <div class="shadow-2xl rounded-lg p-4">
       <h2 class="text-lg font-bold mb-4">Expenses by category</h2>
       <app-expense-report-piechart
-        [currency]="reportCurrency"
-        [filters]="reportFilters"
+        [currency]="filters().currency!"
+        [categorySummaryData]="categorySummaryData()"
       />
     </div>
   </div>
