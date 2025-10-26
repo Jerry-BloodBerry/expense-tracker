@@ -10,18 +10,20 @@ import { SingleResponse } from '../../shared/models/single-response';
 })
 export class ExpenseTagsService {
   private http = inject(HttpClient);
-  tags = signal<Tag[]>([]);
+  #tags = signal<Tag[]>([]);
+
+  readonly tags = this.#tags.asReadonly();
 
   constructor() {
     this.getTags().subscribe();
   }
 
   getTags(): Observable<Tag[]> {
-    let currentTags = this.tags();
+    let currentTags = this.#tags();
     if (currentTags.length > 0) return of(currentTags);
     return this.http.get<ListResponse<Tag>>('/tags').pipe(
       map(res => res.data),
-      tap(tags => this.tags.set(tags))
+      tap(tags => this.#tags.set(tags))
     );
   }
 
@@ -37,6 +39,6 @@ export class ExpenseTagsService {
   }
 
   private clearCache(): void {
-    this.tags.set([]);
+    this.#tags.set([]);
   }
 }

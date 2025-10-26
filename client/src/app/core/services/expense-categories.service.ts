@@ -10,18 +10,20 @@ import { SingleResponse } from '../../shared/models/single-response';
 })
 export class ExpenseCategoriesService {
   private http = inject(HttpClient);
-  categories = signal<Category[]>([]);
+  #categories = signal<Category[]>([]);
+
+  readonly categories = this.#categories.asReadonly();
 
   constructor() {
     this.getCategories().subscribe();
   }
 
   getCategories(): Observable<Category[]> {
-    let currentCategories = this.categories();
+    let currentCategories = this.#categories();
     if (currentCategories.length > 0) return of(currentCategories);
     return this.http.get<ListResponse<Category>>('/categories').pipe(
       map(res => res.data),
-      tap(categories => this.categories.set(categories))
+      tap(categories => this.#categories.set(categories))
     )
   }
 
@@ -37,6 +39,6 @@ export class ExpenseCategoriesService {
   }
 
   private clearCache(): void {
-    this.categories.set([]);
+    this.#categories.set([]);
   }
 }
