@@ -1,4 +1,4 @@
-import { Component, input, OnInit, output, inject} from '@angular/core';
+import { Component, input, OnInit, output, inject, computed, signal} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePicker } from 'primeng/datepicker';
 import { FloatLabel } from "primeng/floatlabel";
@@ -13,26 +13,30 @@ import { ExpenseCategoriesService } from '../../../../core/services/expense-cate
 import { SelectModule } from 'primeng/select';
 import { CURRENCIES } from '../../../../shared/utils/currencies.util';
 
-interface AutoCompleteCompleteEvent {
-  originalEvent: Event;
-  query: string;
-}
-
 @Component({
   selector: 'app-expenses-report-header',
   imports: [FormsModule, DatePicker, FloatLabel, ButtonFilterComponent, Checkbox, AutoComplete, CommonModule, SelectModule],
   templateUrl: './expenses-report-header.component.html'
 })
 export class ExpensesReportHeaderComponent implements OnInit {
+  private expenseCategoriesService = inject(ExpenseCategoriesService);
+
   initialDateRange = input<Date[] | undefined>();
   initialCurrency = input<string>('PLN');
   filtersChange = output<ExpenseReportFilters>();
+
   protected rangeDates: Date[] | undefined;
-  protected categories?: Category[];
-  protected filteredCategories?: Category[];
   protected selectedCategories: Category[] = [];
-  protected categorySearch: any;
+  protected categorySearch = signal<string>('');
   protected selectedCurrency: string = 'PLN';
+
+  protected categories = computed(() =>
+    this.expenseCategoriesService.categories()
+      .sort((a,b) => (
+        a.name.toLowerCase() > b.name.toLowerCase() ? 1 :
+        b.name.toLowerCase() > a.name.toLowerCase() ? -1 : 0
+      )
+    ));
 
   // Available currencies from utility
   protected currencies = CURRENCIES.map(currency => ({
@@ -41,38 +45,28 @@ export class ExpensesReportHeaderComponent implements OnInit {
     symbol: currency.symbol
   }));
 
-  private expenseCategoriesService = inject(ExpenseCategoriesService);
-
   ngOnInit(): void {
     this.rangeDates = this.initialDateRange();
     this.selectedCurrency = this.initialCurrency();
-
-    // Load categories
-    this.expenseCategoriesService.getCategories().subscribe({
-      next: res => {
-        this.categories = res.sort((a,b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : ((b.name.toLowerCase() > a.name.toLowerCase()) ? -1 : 0));
-        this.filteredCategories = this.categories;
-      }
-    });
   }
 
-  getCategoryDisplay = getCategoryDisplay;
+  protected getCategoryDisplay = getCategoryDisplay;
 
-  filterCategories(event: AutoCompleteCompleteEvent) {
-    this.filteredCategories = this.categories?.filter(c => c.name.toLowerCase().startsWith(event.query.toLowerCase())) ?? [];
-  }
+  protected filteredCategories = computed(() =>
+    this.categories().filter(c => c.name.toLowerCase().startsWith(this.categorySearch().toLowerCase())
+  ));
 
-  onDateRangeUpdate() {
+  protected onDateRangeUpdate() {
     if (this.rangeDates?.length == 2 && this.rangeDates[0] && this.rangeDates[1]) {
       this.emitFilters();
     }
   }
 
-  onCategoriesFilter() {
+  protected onCategoriesFilter() {
     this.emitFilters();
   }
 
-  onCurrencyChange() {
+  protected onCurrencyChange() {
     this.emitFilters();
   }
 

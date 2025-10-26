@@ -40,20 +40,19 @@
       <p-autocomplete
         name="categorySearch"
         [(ngModel)]="categorySearch"
-        [suggestions]="categories ?? []"
-        (completeMethod)="filterCategories($event)"
+        [suggestions]="categories()"
         styleClass="flex w-full"
         inputStyleClass="w-full"
         placeholder="Search categories..."
       />
       <div class="flex flex-col gap-4 mt-3">
-        @for (cat of filteredCategories?.slice(0, 5); track $index) {
+        @for (cat of filteredCategories().slice(0, 5); track $index) {
         <ng-template
           #catTemplate
           [ngTemplateOutlet]="catTemplate"
           let-catDisplay
           [ngTemplateOutletContext]="{
-            $implicit: getCategoryDisplay(cat.id, categories ?? [])
+            $implicit: getCategoryDisplay(cat.id, categories())
           }"
         >
           <div class="flex items-center">
