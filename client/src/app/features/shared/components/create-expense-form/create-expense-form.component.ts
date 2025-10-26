@@ -18,8 +18,6 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { Tag } from '../../../../shared/models/tag';
 import { SingleResponse } from '../../../../shared/models/single-response';
 import { ExpenseCategoriesService } from '../../../../core/services/expense-categories.service';
-import { Observable } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
 import { ExpenseTagsService } from '../../../../core/services/expense-tags.service';
 
 @Component({
@@ -37,7 +35,6 @@ import { ExpenseTagsService } from '../../../../core/services/expense-tags.servi
     TextareaModule,
     ToggleSwitch,
     MultiSelectModule,
-    AsyncPipe
   ],
   templateUrl: './create-expense-form.component.html',
   styleUrl: './create-expense-form.component.scss'
@@ -46,22 +43,18 @@ export class CreateExpenseFormComponent implements OnInit {
   private formBuilder = inject(NonNullableFormBuilder);
   private localStorageService = inject(LocalStorageService);
   protected expenseService = inject(ExpenseService);
-  protected currencies = CURRENCIES;
   private expenseCategoriesService = inject(ExpenseCategoriesService);
   private expenseTagsService = inject(ExpenseTagsService);
-  protected categories$: Observable<Category[]>;
-  protected tags$: Observable<Tag[]>;
+
+  protected currencies = CURRENCIES;
+  protected categories = this.expenseCategoriesService.categories;
+  protected tags = this.expenseTagsService.tags;
 
   categoryFilterValue: string = '';
   showCreateCategory: boolean = false;
 
   @Output() expenseCreated = new EventEmitter<Expense>();
   @Output() cancelButtonClicked = new EventEmitter();
-
-  constructor() {
-    this.categories$ = this.expenseCategoriesService.getCategories();
-    this.tags$ = this.expenseTagsService.getTags();
-  }
 
   showCreateTag: boolean = false;
   tagFilterValue: string = '';
@@ -131,7 +124,6 @@ export class CreateExpenseFormComponent implements OnInit {
   createCategory(categoryName: string) {
     this.expenseCategoriesService.createCategory(categoryName).subscribe({
       next: (res: Category) => {
-        this.categories$ = this.expenseCategoriesService.getCategories();
         this.expenseForm.patchValue({ category: res.id });
         this.showCreateCategory = false;
       },
@@ -143,7 +135,7 @@ export class CreateExpenseFormComponent implements OnInit {
 
   filterCallback(event: any) {
     this.categoryFilterValue = event.filter;
-    this.showCreateCategory = !this.expenseCategoriesService.categories.some(
+    this.showCreateCategory = !this.expenseCategoriesService.categories().some(
       cat => cat.name.toLowerCase().startsWith(this.categoryFilterValue.toLowerCase())
     );
   }
@@ -159,7 +151,7 @@ export class CreateExpenseFormComponent implements OnInit {
     }
   }
 
-  handleCancel(event: any) {
+  handleCancel($event: MouseEvent) {
     this.cancelButtonClicked.emit();
   }
 
@@ -170,7 +162,6 @@ export class CreateExpenseFormComponent implements OnInit {
   createTag(tagName: string) {
     this.expenseTagsService.createTag(tagName).subscribe({
       next: (res: Tag) => {
-        this.tags$ = this.expenseTagsService.getTags();
         const current = this.expenseForm.value.tagIds ?? [];
         this.expenseForm.patchValue({ tagIds: [...current, res.id] });
         this.showCreateTag = false;
@@ -183,13 +174,13 @@ export class CreateExpenseFormComponent implements OnInit {
 
   onTagFilter(event: any) {
     this.tagFilterValue = event.filter;
-    this.showCreateTag = !this.expenseTagsService.tags.some(
+    this.showCreateTag = !this.expenseTagsService.tags().some(
       tag => tag.name.toLowerCase() === this.tagFilterValue.toLowerCase()
     ) && this.tagFilterValue.length > 0;
   }
 
   getTagName(tagId: number): string {
-    const tag = this.expenseTagsService.tags.find(t => t.id === tagId);
+    const tag = this.expenseTagsService.tags().find(t => t.id === tagId);
     return tag ? tag.name : '';
   }
 }

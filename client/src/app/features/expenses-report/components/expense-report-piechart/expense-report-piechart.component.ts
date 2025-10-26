@@ -22,14 +22,12 @@ export class ExpenseReportPiechartComponent implements OnInit {
       private cd: ChangeDetectorRef,
       private currencyPipe: FormatCurrencyPipe
     ) {
-      // React to changes in the category summary data
       effect(() => {
         this.initChart();
       });
     }
 
     ngOnInit() {
-      // Initialize chart if data is already available
       this.initChart();
     }
 

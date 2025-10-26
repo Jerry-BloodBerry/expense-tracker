@@ -21,7 +21,7 @@
         <td>{{ expense.name }}</td>
         <td>{{ expense.date | date : "longDate" }}</td>
         <td>
-          @if (categories$ | async; as categories) { @if
+          @if (categories(); as categories) { @if
           (getCategoryDisplay(expense.category, categories); as cat) {
           <p-tag
             [value]="cat.name"

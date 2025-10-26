@@ -61,7 +61,7 @@
     <p-select
       formControlName="category"
       id="category"
-      [options]="(categories$ | async) ?? undefined"
+      [options]="categories()"
       placeholder="Select Category"
       [showClear]="true"
       [filter]="true"
@@ -102,7 +102,7 @@
     <p-multiselect
       formControlName="tagIds"
       display="chip"
-      [options]="(tags$ | async) ?? undefined"
+      [options]="tags()"
       optionLabel="name"
       optionValue="id"
       placeholder="Select Tags"

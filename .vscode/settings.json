@@ -1,6 +1,7 @@
 {
   "tailwindCSS.experimental.configFile": "client/src/styles.scss",
   "cSpell.words": [
-    "barchart"
+    "barchart",
+    "primeng"
   ]
 }

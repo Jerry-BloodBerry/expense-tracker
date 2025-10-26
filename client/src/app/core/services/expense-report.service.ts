@@ -1,7 +1,6 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { ExpenseReport } from '../../shared/models/expense-report';
 import { ExpenseCategorySummary } from '../../shared/models/category-summary';
 import { SingleResponse } from '../../shared/models/single-response';
@@ -11,9 +10,7 @@ import { ExpenseReportFilters } from '../../features/expenses-report/expenses-re
   providedIn: 'root'
 })
 export class ExpenseReportService {
-  baseUrl = environment.apiUrl;
-
-  constructor(private http: HttpClient) { }
+  private http = inject(HttpClient);
 
   getExpenseReport(
     filters: ExpenseReportFilters,
@@ -35,7 +32,7 @@ export class ExpenseReportService {
 
     params = params.append('currency', currency);
 
-    return this.http.get<SingleResponse<ExpenseReport>>(this.baseUrl + 'reports/expenses', { params });
+    return this.http.get<SingleResponse<ExpenseReport>>('/reports/expenses', { params });
   }
 
   getExpenseCategorySummary(
@@ -58,6 +55,6 @@ export class ExpenseReportService {
 
     params = params.append('currency', currency);
 
-    return this.http.get<SingleResponse<ExpenseCategorySummary>>(this.baseUrl + 'reports/expenses/category-summary', { params });
+    return this.http.get<SingleResponse<ExpenseCategorySummary>>('/reports/expenses/category-summary', { params });
   }
 }

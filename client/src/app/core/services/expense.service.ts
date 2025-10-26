@@ -1,5 +1,4 @@
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Expense } from '../../shared/models/expense';
 import { Pagination } from '../../shared/models/pagination';
@@ -12,7 +11,6 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ExpenseService {
-  baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
 
   getExpenses(queryParams: ExpenseQueryParams): Observable<Pagination<Expense>> {
@@ -47,11 +45,11 @@ export class ExpenseService {
     params = params.append('pageSize', queryParams.pageSize);
     params = params.append('page', queryParams.page);
 
-    return this.http.get<Pagination<Expense>>(this.baseUrl + 'expenses', {params});
+    return this.http.get<Pagination<Expense>>('/expenses', {params});
   }
 
   createExpense(expenseData: CreateExpenseDto) {
-    return this.http.post<SingleResponse<Expense>>(this.baseUrl + 'expenses', expenseData);
+    return this.http.post<SingleResponse<Expense>>('/expenses', expenseData);
   }
 
 }

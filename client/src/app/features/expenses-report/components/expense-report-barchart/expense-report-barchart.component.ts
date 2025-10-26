@@ -4,7 +4,6 @@ import { ChangeDetectorRef, Component, inject, input, OnInit, PLATFORM_ID, effec
 import { ExpenseReport } from '../../../../shared/models/expense-report';
 import { format } from 'date-fns';
 import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
-import { SingleResponse } from '../../../../shared/models/single-response';
 
 @Component({
   selector: 'app-expense-report-barchart',
@@ -24,14 +23,12 @@ export class ExpenseReportBarchartComponent implements OnInit {
       private cd: ChangeDetectorRef,
       private currencyPipe: FormatCurrencyPipe
     ) {
-      // React to changes in the expenses data
       effect(() => {
         this.initChart();
       });
     }
 
     ngOnInit() {
-      // Initialize chart if data is already available
       this.initChart();
     }
 

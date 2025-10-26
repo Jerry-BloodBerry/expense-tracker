@@ -1,6 +1,5 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { map, Observable, of, switchMap, tap } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Category } from '../../shared/models/category';
 import { ListResponse } from '../../shared/models/list-response';
@@ -10,20 +9,24 @@ import { SingleResponse } from '../../shared/models/single-response';
   providedIn: 'root'
 })
 export class ExpenseCategoriesService {
-  baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
-  categories: Category[] = [];
+  categories = signal<Category[]>([]);
+
+  constructor() {
+    this.getCategories().subscribe();
+  }
 
   getCategories(): Observable<Category[]> {
-    if (this.categories.length > 0) return of(this.categories);
-    return this.http.get<ListResponse<Category>>(this.baseUrl + 'categories').pipe(
+    let currentCategories = this.categories();
+    if (currentCategories.length > 0) return of(currentCategories);
+    return this.http.get<ListResponse<Category>>('/categories').pipe(
       map(res => res.data),
-      tap(categories => this.categories = categories)
+      tap(categories => this.categories.set(categories))
     )
   }
 
   createCategory(name: string, description?: string): Observable<Category> {
-    return this.http.post<SingleResponse<Category>>(this.baseUrl + 'categories', {name, description}).pipe(
+    return this.http.post<SingleResponse<Category>>('/categories', {name, description}).pipe(
       switchMap(createdCategoryResponse => {
         this.clearCache();
         return this.getCategories().pipe(
@@ -34,6 +37,6 @@ export class ExpenseCategoriesService {
   }
 
   private clearCache(): void {
-    this.categories = [];
+    this.categories.set([]);
   }
 }
