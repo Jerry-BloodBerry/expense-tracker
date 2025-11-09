@@ -1,14 +1,9 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { ExpensesReportComponent } from './features/expenses-report/expenses-report.component';
-import { ExpensesListComponent } from './features/expenses-list/expenses-list.component';
-import { CategoriesListComponent } from './features/categories-list/categories-list.component';
-import { TagsListComponent } from './features/tags-list/tags-list.component';
 
 export const routes: Routes = [
-  {path: '', component: DashboardComponent},
-  {path: 'expenses', component: ExpensesListComponent},
-  {path: 'expenses/report', component: ExpensesReportComponent},
-  {path: 'categories', component: CategoriesListComponent},
-  {path: 'tags', component: TagsListComponent}
+  {path: '', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)},
+  {path: 'expenses', loadComponent: () => import('./features/expenses-list/expenses-list.component').then(m => m.ExpensesListComponent)},
+  {path: 'expenses/report', loadComponent: () => import('./features/expenses-report/expenses-report.component').then(m => m.ExpensesReportComponent)},
+  {path: 'categories', loadComponent: () => import('./features/categories-list/categories-list.component').then(m => m.CategoriesListComponent)},
+  {path: 'tags', loadComponent: () => import('./features/tags-list/tags-list.component').then(m => m.TagsListComponent)}
 ];
