@@ -42,6 +42,10 @@ export class ExpenseService {
       params = params.append('isRecurring', queryParams.isRecurring);
     }
 
+    if (queryParams.search && queryParams.search.trim()) {
+      params = params.append('search', queryParams.search.trim());
+    }
+
     params = params.append('pageSize', queryParams.pageSize);
     params = params.append('page', queryParams.page);
 

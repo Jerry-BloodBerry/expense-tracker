@@ -15,6 +15,7 @@ public class GetExpensesQuery : IRequest<ErrorOr<ExpensesResult>>
   public decimal? MinAmount { get; init; }
   public decimal? MaxAmount { get; init; }
   public bool? IsRecurring { get; init; }
+  public string? Search { get; init; }
   public int Page { get; init; } = 1;
   public int PageSize { get; init; } = 10;
 }

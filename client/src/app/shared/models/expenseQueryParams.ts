@@ -6,6 +6,7 @@ export class ExpenseQueryParams {
   minAmount?: number;
   maxAmount?: number;
   isRecurring?: boolean;
+  search?: string;
   page = 1;
   pageSize = 10;
 }

@@ -19,6 +19,11 @@ export class SideMenuComponent {
       routerLink: '/'
     },
     {
+      label: 'Expenses',
+      icon: 'pi pi-list',
+      routerLink: '/expenses'
+    },
+    {
       label: 'Expenses Report',
       icon: 'pi pi-chart-bar',
       routerLink: '/expenses/report'

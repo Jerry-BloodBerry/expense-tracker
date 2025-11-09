@@ -1,0 +1,144 @@
+<p-card class="expenses-list-card">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">All Expenses</h1>
+    <app-create-expense-dialog (expenseCreated)="onExpenseCreated()" />
+  </div>
+
+  <!-- Filters Section -->
+  <div class="flex flex-col gap-4 mb-6">
+    <div class="flex flex-row gap-4 items-end">
+      <!-- Search Input -->
+      <p-float-label class="flex-auto">
+        <input
+          pInputText
+          id="searchInput"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event); onSearchChange()"
+          placeholder="Search expenses..."
+          class="w-full"
+        />
+        <label for="searchInput">Search</label>
+      </p-float-label>
+
+      <!-- Date Filter -->
+      <p-float-label variant="on">
+        <p-datepicker
+          name="dateRange"
+          inputId="dateRangeInput"
+          [ngModel]="dateRange()"
+          (ngModelChange)="dateRange.set($event)"
+          (onSelect)="onDateRangeChange()"
+          selectionMode="range"
+          [readonlyInput]="true"
+          [iconDisplay]="'input'"
+          [showIcon]="true"
+          dateFormat="dd.mm.yy"
+          ariaLabel="Date range"
+          [showButtonBar]="true"
+        />
+        <label for="dateRangeInput">Date Range</label>
+      </p-float-label>
+
+      <!-- Clear Date Filter Button -->
+      @if (dateRange() && dateRange()!.length > 0) {
+      <p-button
+        label="Clear"
+        severity="secondary"
+        icon="pi pi-times"
+        (click)="clearDateFilter()"
+      />
+      }
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  @if (pagination() && !isLoading()) { @if (expenses().length > 0) {
+  <div class="table-container">
+    <p-table
+      [value]="expenses()"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      stripedRows
+      [paginator]="false"
+      [scrollable]="true"
+      scrollHeight="calc(100vh - 412px)"
+    >
+      <ng-template #header>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Date</th>
+          <th>Category</th>
+          <th>Amount</th>
+          <th>Recurring</th>
+          <th>Details</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-expense>
+        <tr>
+          <td>{{ expense.id }}</td>
+          <td>{{ expense.name }}</td>
+          <td>{{ expense.date | date : "longDate" }}</td>
+          <td>
+            @if (categories(); as categories) { @if
+            (getCategoryDisplay(expense.category, categories); as cat) {
+            <p-tag
+              [value]="cat.name"
+              [style]="{
+                'background-color': cat.color,
+                color: '#fff',
+                'border-radius': '20px',
+                'font-weight': 'normal',
+                padding: '4px 12px'
+              }"
+            ></p-tag>
+            } }
+          </td>
+          <td class="price">
+            {{ expense.amount | formatCurrency : expense.currency }}
+          </td>
+          <td>
+            @if (expense.isRecurring) {
+            <p-tag
+              [value]="expense.recurrenceInterval || 'Recurring'"
+              severity="info"
+            ></p-tag>
+            } @else {
+            <span class="text-gray-400">-</span>
+            }
+          </td>
+          <td>
+            <a
+              [routerLink]="['/expenses', expense.id]"
+              class="px-[12px] py-[4px] bg-blue-600 rounded-full text-white hover:cursor-pointer"
+            >
+              Details
+            </a>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Paginator -->
+  <p-paginator
+    [first]="first()"
+    [rows]="rows()"
+    [totalRecords]="pagination()!.totalCount"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    (onPageChange)="onPageChange($event)"
+    class="mt-4"
+  ></p-paginator>
+  } @else {
+  <p class="text-md text-gray-400 text-center py-8">
+    No expenses found. Try adjusting your filters or add a new expense!
+  </p>
+  } } @else if (isLoading()) {
+  <div class="flex justify-center items-center py-8">
+    <app-loader />
+  </div>
+  } @else {
+  <p class="text-md text-gray-400 text-center py-8">
+    No expenses found. Add your first expense now!
+  </p>
+  }
+</p-card>
