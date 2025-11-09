@@ -24,18 +24,18 @@ export class SideMenuComponent {
       routerLink: '/expenses'
     },
     {
-      label: 'Expenses Report',
+      label: 'Reporting',
       icon: 'pi pi-chart-bar',
       routerLink: '/expenses/report'
     },
     {
       label: 'Categories',
-      icon: 'pi pi-tags',
+      icon: 'pi pi-bookmark',
       routerLink: '/categories'
     },
     {
       label: 'Tags',
-      icon: 'pi pi-bookmark',
+      icon: 'pi pi-tags',
       routerLink: '/tags'
     }
   ];

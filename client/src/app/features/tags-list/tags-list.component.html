@@ -1,0 +1,66 @@
+<p-card class="tags-list-card">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Tags</h1>
+  </div>
+
+  <!-- Search Section -->
+  <div class="flex flex-col gap-4 mb-6">
+    <p-float-label class="w-full">
+      <input
+        pInputText
+        id="searchInput"
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event); onSearchChange()"
+        placeholder="Search tags..."
+        class="w-full"
+      />
+      <label for="searchInput">Search</label>
+    </p-float-label>
+
+    <!-- Create Tag Option -->
+    @if (showCreateTag()) {
+      <div class="flex items-center gap-2 p-3 bg-surface-50 rounded border border-surface-200">
+        <span class="text-sm text-surface-600">
+          Tag "{{ searchQuery() }}" does not exist.
+        </span>
+        <p-button
+          label="Create Tag"
+          icon="pi pi-plus"
+          severity="secondary"
+          size="small"
+          (click)="onCreateTagClick()"
+        />
+      </div>
+    }
+  </div>
+
+  <!-- Tags Section -->
+  <div class="tags-container">
+    @if (filteredTags().length > 0) {
+      <div class="tags-grid">
+        @for (tag of filteredTags(); track tag.id) {
+          <p-tag
+            [value]="tag.name"
+            [style]="{
+              'background-color': getTagColor(tag),
+              color: '#fff',
+              'border-radius': '20px',
+              'font-weight': 'normal',
+              padding: '8px 16px',
+              cursor: 'default'
+            }"
+          ></p-tag>
+        }
+      </div>
+    } @else if (searchQuery().trim()) {
+      <p class="text-md text-gray-400 text-center py-8">
+        No tags found matching "{{ searchQuery() }}"
+      </p>
+    } @else {
+      <p class="text-md text-gray-400 text-center py-8">
+        No tags found. Create your first tag!
+      </p>
+    }
+  </div>
+</p-card>
+
