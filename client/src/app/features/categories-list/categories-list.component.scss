@@ -1,0 +1,42 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+::ng-deep {
+  .categories-list-card {
+    height: calc(100vh - 150px);
+    display: flex;
+    flex-direction: column;
+    
+    .p-card-body {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    .p-card-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+  }
+}
+
+.categories-container {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.categories-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 8px 0;
+}
+
