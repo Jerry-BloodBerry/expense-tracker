@@ -1,22 +1,28 @@
 <div class="w-full">
   <div class="flex-col">
+    @if (summary() && !isLoading()) {
     <div class="grid grid-cols-3 gap-4 mb-8">
       <app-expense-summary-card
         icon="pi pi-calendar-clock"
-        [header]="399.99 | formatCurrency : 'PLN'"
+        [header]="summary()!.totalExpenses | formatCurrency : 'PLN'"
         description="Total expenses this month"
       />
       <app-expense-summary-card
         icon="pi pi-chart-line"
-        header="Shopping"
+        [header]="summary()!.topCategoryName"
         description="Top spending category"
       />
       <app-expense-summary-card
         icon="pi pi-undo"
-        [header]="40.99 | formatCurrency : 'PLN'"
+        [header]="summary()!.totalRecurringExpenses | formatCurrency : 'PLN'"
         description="Recurring expenses this month"
       />
     </div>
+    } @else if (isLoading()) {
+    <div class="flex justify-center items-center py-8">
+      <app-loader />
+    </div>
+    }
     <app-recent-expenses-table />
   </div>
 </div>
