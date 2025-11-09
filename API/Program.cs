@@ -70,7 +70,7 @@ var app = builder.Build();
 app.UseCors(c => c
     .AllowAnyHeader()
     .AllowAnyMethod()
-    .WithOrigins("http://localhost:4200", "https://localhost:4200")
+    .WithOrigins("http://localhost:4200", "https://localhost:4200", "http://localhost:8080", "https://localhost:8080")
 );
 
 // Enable forwarded headers
