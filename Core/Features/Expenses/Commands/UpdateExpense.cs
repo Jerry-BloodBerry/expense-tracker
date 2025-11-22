@@ -49,9 +49,12 @@ public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ErrorO
       if (category is null)
         return ExpenseErrors.CategoryNotFound(request.CategoryId);
 
+      expense.UpdateName(request.Name);
       expense.UpdateCategory(category);
       expense.UpdateAmount(request.Amount);
       expense.SetDescription(request.Description);
+      expense.SetDate(request.Date);
+      expense.SetCurrency(request.Currency);
 
       if (request.IsRecurring && !string.IsNullOrEmpty(request.RecurrenceInterval))
       {

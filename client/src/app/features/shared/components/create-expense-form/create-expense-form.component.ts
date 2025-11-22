@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, inject, OnInit, OnChanges, Output, EventEmitter, Input, computed, SimpleChanges } from '@angular/core';
 import { FormsModule, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DatePicker } from 'primeng/datepicker';
 import { FloatLabel } from 'primeng/floatlabel';
@@ -39,7 +39,7 @@ import { ExpenseTagsService } from '../../../../core/services/expense-tags.servi
   templateUrl: './create-expense-form.component.html',
   styleUrl: './create-expense-form.component.scss'
 })
-export class CreateExpenseFormComponent implements OnInit {
+export class CreateExpenseFormComponent implements OnInit, OnChanges {
   private formBuilder = inject(NonNullableFormBuilder);
   private localStorageService = inject(LocalStorageService);
   protected expenseService = inject(ExpenseService);
@@ -50,16 +50,23 @@ export class CreateExpenseFormComponent implements OnInit {
   protected categories = this.expenseCategoriesService.categories;
   protected tags = this.expenseTagsService.tags;
 
-  categoryFilterValue: string = '';
-  showCreateCategory: boolean = false;
+  @Input() mode: 'create' | 'edit' = 'create';
+  @Input() expenseToEdit: Expense | null = null;
 
   @Output() expenseCreated = new EventEmitter<Expense>();
+  @Output() expenseUpdated = new EventEmitter<Expense>();
   @Output() cancelButtonClicked = new EventEmitter();
+
+  protected submitButtonLabel = computed(() => this.mode === 'edit' ? 'Update' : 'Create');
+
+  categoryFilterValue: string = '';
+  showCreateCategory: boolean = false;
 
   showCreateTag: boolean = false;
   tagFilterValue: string = '';
 
   recurrenceIntervals = Object.values(RecurrenceInterval);
+  isSubmitting = false;
 
   expenseForm = this.formBuilder.group({
     title: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(200)]],
@@ -70,11 +77,15 @@ export class CreateExpenseFormComponent implements OnInit {
     date: [null as Date | null, [Validators.required]],
     isRecurring: [false, [Validators.required]],
     tagIds: this.formBuilder.control<number[]>([], []),
-    recurrenceInterval: [null]
+    recurrenceInterval: [null as RecurrenceInterval | null, []]
   });
 
   ngOnInit(): void {
-    this.loadLastUsedCurrency();
+    if (this.mode === 'edit' && this.expenseToEdit) {
+      this.populateFormForEdit();
+    } else {
+      this.loadLastUsedCurrency();
+    }
     // Initially disable the control if not recurring
     if (!this.expenseForm.get('isRecurring')!.value) {
       this.expenseForm.get('recurrenceInterval')!.disable();
@@ -89,11 +100,39 @@ export class CreateExpenseFormComponent implements OnInit {
     })
   }
 
-  onSubmit() {
+  ngOnChanges(changes: SimpleChanges): void {
+    // If expenseToEdit changes after initialization, repopulate the form
+    if (changes['expenseToEdit'] && !changes['expenseToEdit'].firstChange && this.mode === 'edit' && this.expenseToEdit) {
+      this.populateFormForEdit();
+    }
+  }
+
+  private populateFormForEdit(): void {
+    if (!this.expenseToEdit) return;
+
+    const currency = CURRENCIES.find(c => c.code === this.expenseToEdit!.currency) || CURRENCIES[0];
+    const dateValue = this.expenseToEdit.date instanceof Date
+      ? this.expenseToEdit.date
+      : new Date(this.expenseToEdit.date);
+
+    this.expenseForm.patchValue({
+      title: this.expenseToEdit.name,
+      amount: this.expenseToEdit.amount,
+      category: this.expenseToEdit.category,
+      description: this.expenseToEdit.description || '',
+      currency: currency,
+      date: dateValue,
+      isRecurring: this.expenseToEdit.isRecurring,
+      tagIds: this.expenseToEdit.tags || [],
+      recurrenceInterval: this.expenseToEdit.recurrenceInterval || null
+    });
+  }  onSubmit() {
     if (this.expenseForm.invalid) {
       this.expenseForm.markAllAsTouched();
       return;
     }
+
+    this.isSubmitting = true;
 
     // Map form values to the expected DTO for the backend
     const formValue = this.expenseForm.value;
@@ -109,16 +148,31 @@ export class CreateExpenseFormComponent implements OnInit {
       recurrenceInterval: formValue.isRecurring ? (formValue.recurrenceInterval ?? null) : null
     };
 
-    this.expenseService.createExpense(expenseDto).subscribe({
-      next: (res: SingleResponse<Expense>) => {
-        this.expenseCreated.emit(res.data);
-        this.expenseForm.reset();
-      },
-      error: (err: unknown) => {
-        console.error('Failed to create expense:', err);
-        this.expenseForm.enable();
-      }
-    });
+    if (this.mode === 'edit' && this.expenseToEdit) {
+      this.expenseService.updateExpense(this.expenseToEdit.id, expenseDto).subscribe({
+        next: (res: SingleResponse<Expense>) => {
+          this.expenseUpdated.emit(res.data);
+          this.isSubmitting = false;
+        },
+        error: (err: unknown) => {
+          console.error('Failed to update expense:', err);
+          this.isSubmitting = false;
+        }
+      });
+    } else {
+      this.expenseService.createExpense(expenseDto).subscribe({
+        next: (res: SingleResponse<Expense>) => {
+          this.expenseCreated.emit(res.data);
+          this.expenseForm.reset();
+          this.isSubmitting = false;
+        },
+        error: (err: unknown) => {
+          console.error('Failed to create expense:', err);
+          this.expenseForm.enable();
+          this.isSubmitting = false;
+        }
+      });
+    }
   }
 
   createCategory(categoryName: string) {

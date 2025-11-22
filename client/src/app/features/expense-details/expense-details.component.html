@@ -1,0 +1,142 @@
+<div class="container mx-auto px-4 pt-0!">
+  <p-confirmDialog></p-confirmDialog>
+  @if (isLoading()) {
+    <app-loader />
+  }
+  @if (expense(); as expense) {
+    <div class="flex mb-4">
+      <button pButton type="button" icon="pi pi-arrow-left"
+        label="Back to Expenses"
+        severity="secondary"
+        class="p-button-rounded p-button-text"
+        (click)="goBack()">
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Main Details Card -->
+      <div class="lg:col-span-2">
+        <p-card class="shadow-lg">
+          <ng-template pTemplate="header">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 w-full">
+              <h1 class="text-3xl font-bold mb-2">{{ expense.name }}</h1>
+              <p class="text-blue-100">
+                {{ expense.date | date: 'fullDate' }}
+              </p>
+            </div>
+          </ng-template>
+
+          <div class="space-y-4">
+            <!-- Amount -->
+            <div class="border-b pb-4">
+              <h3 class="text-gray-600 text-sm font-semibold mb-2">AMOUNT</h3>
+              <p class="text-3xl font-bold text-blue-600">
+                {{ expense.amount | formatCurrency: expense.currency }}
+              </p>
+            </div>
+
+            <!-- Category -->
+              <!-- Description -->
+              @if (expense.description) {
+                <div class="border-b pb-4">
+                  <h3 class="text-gray-600 text-sm font-semibold mb-2">DESCRIPTION</h3>
+                  <p class="text-lg">{{ expense.description }}</p>
+                </div>
+              }
+
+            <div class="border-b pb-4">
+              <h3 class="text-gray-600 text-sm font-semibold mb-2">CATEGORY</h3>
+              <p class="text-lg">{{ getCategoryName(expense.category) }}</p>
+            </div>
+
+            <!-- Tags -->
+            @if (expense.tags && expense.tags.length > 0) {
+              <div class="border-b pb-4">
+                <div class="flex space-x-2 text-gray-600 text-sm font-semibold mb-2">
+                  <h3>TAGS</h3>
+                  <span>({{ expense.tags.length || 0 }})</span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  @for (tagId of expense.tags; track tagId) {
+                    @if (getTagObject(tagId); as tag) {
+                      <p-tag [value]="tag.name" severity="info" />
+                    }
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Recurrence -->
+            <div class="border-b pb-4">
+              <h3 class="text-gray-600 text-sm font-semibold mb-2">RECURRING</h3>
+              <p class="text-lg">
+                {{ getRecurrenceDisplay(expense.isRecurring, expense.recurrenceInterval) }}
+              </p>
+            </div>
+
+            <!-- Currency -->
+            <div class="pb-4">
+              <h3 class="text-gray-600 text-sm font-semibold mb-2">CURRENCY</h3>
+              <p class="text-lg font-mono">{{ expense.currency }}</p>
+            </div>
+          </div>
+
+          <ng-template pTemplate="footer">
+            <div class="flex gap-2 justify-end">
+              <button pButton type="button" label="Edit"
+                icon="pi pi-pencil"
+                class="p-button-info"
+                (click)="openEditDialog()">
+              </button>
+              <button pButton type="button" label="Delete"
+                icon="pi pi-trash"
+                severity="danger"
+                (click)="deleteExpense()">
+              </button>
+            </div>
+          </ng-template>
+        </p-card>
+      </div>
+
+      <!-- Summary Card -->
+      <div>
+        <p-card class="shadow-lg">
+          <ng-template pTemplate="header">
+            <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 w-full">
+              <h2 class="text-xl font-bold">Summary</h2>
+            </div>
+          </ng-template>
+
+          <div class="space-y-4">
+            <div>
+              <p class="text-gray-600 text-sm mb-1">Total Amount</p>
+              <p class="text-2xl font-bold text-green-600">
+                {{ expense.amount | formatCurrency: expense.currency }}
+              </p>
+            </div>
+            <div class="border-t pt-4">
+              <p class="text-gray-600 text-sm mb-1">Date</p>
+              <p class="text-lg font-semibold">{{ expense.date | date: 'MMM dd, yyyy' }}</p>
+            </div>
+          </div>
+        </p-card>
+      </div>
+    </div>
+
+    <!-- Edit Dialog -->
+    <p-dialog [visible]="showEditDialog()"
+      (visibleChange)="showEditDialog.set($event)"
+      [header]="'Edit Expense'"
+      [modal]="true"
+      [maximizable]="true"
+    >
+      @if (expense) {
+        <app-edit-expense-form
+          [expense]="expense"
+          (expenseUpdated)="onExpenseUpdated($event)"
+          (cancelButtonClicked)="closeEditDialog()">
+        </app-edit-expense-form>
+      }
+    </p-dialog>
+  }
+</div>

@@ -56,4 +56,16 @@ export class ExpenseService {
     return this.http.post<SingleResponse<Expense>>('/expenses', expenseData);
   }
 
+  getExpenseById(id: number): Observable<SingleResponse<Expense>> {
+    return this.http.get<SingleResponse<Expense>>(`/expenses/${id}`);
+  }
+
+  updateExpense(id: number, expenseData: CreateExpenseDto): Observable<SingleResponse<Expense>> {
+    return this.http.put<SingleResponse<Expense>>(`/expenses/${id}`, expenseData);
+  }
+
+  deleteExpense(id: number): Observable<void> {
+    return this.http.delete<void>(`/expenses/${id}`);
+  }
+
 }

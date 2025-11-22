@@ -1,0 +1,17 @@
+.container {
+  padding: 1.5rem;
+}
+
+:host ::ng-deep {
+  .p-card {
+    border-radius: 0.5rem;
+  }
+
+  .p-card-header {
+    padding: 0;
+  }
+
+  .p-tag {
+    margin-bottom: 0.25rem;
+  }
+}

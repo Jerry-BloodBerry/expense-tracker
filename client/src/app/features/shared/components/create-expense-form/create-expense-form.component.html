@@ -1,5 +1,5 @@
 <form [formGroup]="expenseForm" (ngSubmit)="onSubmit()">
-  <div class="flex items-center gap-4 mb-4">
+  <div class="flex items-center gap-4 my-4">
     <label for="title" class="font-semibold w-24">Title</label>
     <div class="flex-col flex-auto">
       <p-float-label
@@ -160,7 +160,7 @@
         formControlName="description"
         rows="5"
         cols="32"
-        style="resize: none"
+        style="resize: horizontal"
         class="h-full w-full"
       ></textarea>
       <label for="description">Description</label>
@@ -187,8 +187,8 @@
       severity="secondary"
       (click)="handleCancel($event)"
     />
-    <button pButton pRipple severity="success" type="submit">
-      <span pButtonLabel>Create</span>
+    <button pButton pRipple severity="success" type="submit" [disabled]="isSubmitting">
+      <span pButtonLabel>{{ submitButtonLabel() }}</span>
     </button>
   </div>
 </form>

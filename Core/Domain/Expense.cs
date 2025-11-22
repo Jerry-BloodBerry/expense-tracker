@@ -118,4 +118,22 @@ public class Expense : BaseEntity
 
         return newExpense;
     }
+
+  internal void UpdateName(string name)
+  {
+    if (string.IsNullOrWhiteSpace(name))
+        throw new ArgumentException("Name cannot be empty", nameof(name));
+
+    Name = name;
+  }
+
+  internal void SetDate(DateTime date)
+  {
+    Date = date;
+  }
+
+  internal void SetCurrency(string currency)
+  {
+    Currency = currency;
+  }
 }
