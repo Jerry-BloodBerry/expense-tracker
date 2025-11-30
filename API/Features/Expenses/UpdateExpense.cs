@@ -5,7 +5,19 @@ using API.Utils.Response;
 
 namespace API.Features.Expenses;
 
-public class UpdateExpenseEndpoint : Endpoint<UpdateExpenseCommand, SingleResponse<ExpenseResponse>>
+public record UpdateExpenseRequest(
+  int Id,
+  string Name,
+  int CategoryId,
+  decimal Amount,
+  DateTime Date,
+  string? Description,
+  string Currency,
+  bool IsRecurring,
+  string? RecurrenceInterval,
+  List<int> TagIds);
+
+public class UpdateExpenseEndpoint : Endpoint<UpdateExpenseRequest, SingleResponse<ExpenseResponse>>
 {
   private readonly IMediator _mediator;
 
@@ -25,9 +37,23 @@ public class UpdateExpenseEndpoint : Endpoint<UpdateExpenseCommand, SingleRespon
         .WithTags("Expenses"));
   }
 
-  public override async Task HandleAsync(UpdateExpenseCommand req, CancellationToken ct)
+  public override async Task HandleAsync(UpdateExpenseRequest req, CancellationToken ct)
   {
-    var result = await _mediator.Send(req, ct);
+    var command = new UpdateExpenseCommand
+    {
+      Id = req.Id,
+      Name = req.Name,
+      CategoryId = req.CategoryId,
+      Amount = req.Amount,
+      Date = DateOnly.FromDateTime(req.Date),
+      Description = req.Description,
+      Currency = req.Currency,
+      IsRecurring = req.IsRecurring,
+      RecurrenceInterval = req.RecurrenceInterval,
+      TagIds = req.TagIds
+    };
+
+    var result = await _mediator.Send(command, ct);
 
     if (result.IsError)
     {
@@ -39,7 +65,7 @@ public class UpdateExpenseEndpoint : Endpoint<UpdateExpenseCommand, SingleRespon
       Id: result.Value.Id,
       Name: result.Value.Name,
       Amount: result.Value.Amount,
-      Date: result.Value.Date,
+      Date: result.Value.Date.ToDateTime(TimeOnly.MinValue),
       Description: result.Value.Description,
       Currency: result.Value.Currency,
       IsRecurring: result.Value.IsRecurring,

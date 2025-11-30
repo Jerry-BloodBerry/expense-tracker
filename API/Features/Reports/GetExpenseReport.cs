@@ -43,18 +43,18 @@ namespace API.Features.Reports
         }
     }
 
-    public record ExpenseReportDataPointResponse
-    {
-        public DateTime Date { get; init; }
-        public decimal Amount { get; init; }
-    }
-
     public record ExpenseReportResponse
     {
         public string Currency { get; init; } = string.Empty;
-        public DateTime StartDate { get; init; }
-        public DateTime EndDate { get; init; }
+        public DateOnly StartDate { get; init; }
+        public DateOnly EndDate { get; init; }
         public List<ExpenseReportDataPointResponse> DataPoints { get; init; } = [];
+    }
+
+    public record ExpenseReportDataPointResponse
+    {
+        public DateOnly Date { get; init; }
+        public decimal Amount { get; init; }
     }
 
     public class GetExpenseReportEndpoint : Endpoint<GetExpenseReportRequest, SingleResponse<ExpenseReportResponse>>
@@ -81,8 +81,8 @@ namespace API.Features.Reports
         {
             var query = new GetExpenseReportQuery
             {
-                StartDate = req.StartDate.ToUniversalTime(),
-                EndDate = req.EndDate.ToUniversalTime(),
+                StartDate = DateOnly.FromDateTime(req.StartDate),
+                EndDate = DateOnly.FromDateTime(req.EndDate),
                 Currency = req.Currency,
                 TagIds = req.TagIds?.Select(int.Parse).ToList() ?? [],
                 CategoryIds = req.CategoryIds?.Select(int.Parse).ToList() ?? []

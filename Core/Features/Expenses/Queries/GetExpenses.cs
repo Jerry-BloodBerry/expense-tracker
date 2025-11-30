@@ -8,8 +8,8 @@ namespace Core.Features.Expenses.Queries;
 
 public class GetExpensesQuery : IRequest<ErrorOr<ExpensesResult>>
 {
-  public DateTime? StartDate { get; init; }
-  public DateTime? EndDate { get; init; }
+  public DateOnly? StartDate { get; init; }
+  public DateOnly? EndDate { get; init; }
   public int? CategoryId { get; init; }
   public List<int> TagIds { get; init; } = [];
   public decimal? MinAmount { get; init; }

@@ -20,7 +20,7 @@ public static class ExpenseDtoExtensions
       Category: dto.Category.Id,
       Tags: dto.Tags.Select(t => t.Id).ToList(),
       Amount: dto.Amount,
-      Date: dto.Date,
+      Date: dto.Date.ToDateTime(TimeOnly.MinValue),
       Description: dto.Description,
       Currency: dto.Currency,
       IsRecurring: dto.IsRecurring,

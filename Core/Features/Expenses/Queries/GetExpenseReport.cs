@@ -8,8 +8,8 @@ namespace Core.Features.Expenses.Queries;
 
 public class GetExpenseReportQuery : IRequest<ErrorOr<ExpenseReportResult>>
 {
-  public DateTime StartDate { get; init; }
-  public DateTime EndDate { get; init; }
+  public DateOnly StartDate { get; init; }
+  public DateOnly EndDate { get; init; }
   public string Currency { get; init; } = string.Empty;
   public List<int> TagIds { get; init; } = [];
   public List<int> CategoryIds { get; init; } = [];
@@ -18,14 +18,14 @@ public class GetExpenseReportQuery : IRequest<ErrorOr<ExpenseReportResult>>
 public class ExpenseReportResult
 {
   public string Currency { get; set; } = string.Empty;
-  public DateTime StartDate { get; set; }
-  public DateTime EndDate { get; set; }
+  public DateOnly StartDate { get; set; }
+  public DateOnly EndDate { get; set; }
   public List<ExpenseReportDataPoint> DataPoints { get; set; } = [];
 }
 
 public class ExpenseReportDataPoint
 {
-  public DateTime Date { get; set; }
+  public DateOnly Date { get; set; }
   public decimal Amount { get; set; }
 }
 
@@ -55,7 +55,7 @@ public class GetExpenseReportHandler : IRequestHandler<GetExpenseReportQuery, Er
 
     // Group expenses by date and sum amounts
     var dailyTotals = expenses
-        .GroupBy(e => e.Date.Date)
+        .GroupBy(e => e.Date)
         .Select(g => new ExpenseReportDataPoint
         {
           Date = g.Key,
@@ -66,9 +66,9 @@ public class GetExpenseReportHandler : IRequestHandler<GetExpenseReportQuery, Er
 
     // Fill in missing dates with zero amounts
     var allDates = new List<ExpenseReportDataPoint>();
-    var currentDate = request.StartDate.Date;
+    var currentDate = request.StartDate;
 
-    while (currentDate <= request.EndDate.Date)
+    while (currentDate <= request.EndDate)
     {
       var existingDataPoint = dailyTotals.FirstOrDefault(dp => dp.Date == currentDate);
       allDates.Add(existingDataPoint ?? new ExpenseReportDataPoint

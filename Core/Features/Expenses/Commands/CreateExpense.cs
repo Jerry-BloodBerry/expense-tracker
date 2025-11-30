@@ -12,7 +12,7 @@ public record CreateExpenseCommand : IRequest<ErrorOr<ExpenseDto>>
   public required string Name { get; init; }
   public int CategoryId { get; init; }
   public decimal Amount { get; init; }
-  public DateTime Date { get; init; }
+  public DateOnly Date { get; init; }
   public string? Description { get; init; }
   public required string Currency { get; init; }
   public bool IsRecurring { get; init; }

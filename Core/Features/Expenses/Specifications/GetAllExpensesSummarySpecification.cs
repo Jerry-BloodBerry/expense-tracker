@@ -6,7 +6,7 @@ namespace Core.Features.Expenses.Specifications;
 
 public class GetAllExpensesSummarySpecification : BaseSpecification<Expense>
 {
-  public GetAllExpensesSummarySpecification(DateTime startDate, DateTime endDate, bool? isRecurring = null)
+  public GetAllExpensesSummarySpecification(DateOnly startDate, DateOnly endDate, bool? isRecurring = null)
       : base(e =>
           e.Date >= startDate &&
           e.Date <= endDate &&

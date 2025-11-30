@@ -40,14 +40,13 @@ public class ExpenseSeeder : ISeeder
       var category = await _categoryRepository.GetByIdAsync(expenseData.CategoryId, CancellationToken.None);
       if (category == null) continue;
 
-      var date = DateTime.Parse(expenseData.Date, CultureInfo.InvariantCulture);
-      var utcDate = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+      var date = DateOnly.Parse(expenseData.Date, CultureInfo.InvariantCulture);
 
       var expense = new Expense(
           expenseData.Name,
           category,
           expenseData.Amount,
-          utcDate,
+          date,
           expenseData.Currency
       );
 

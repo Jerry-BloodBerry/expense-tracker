@@ -26,9 +26,9 @@ public class GetTotalRecurringExpensesThisMonthEndpoint : EndpointWithoutRequest
 
   public override async Task HandleAsync(CancellationToken ct)
   {
-    var now = DateTime.UtcNow;
-    var startDate = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-    var endDate = startDate.AddMonths(1).AddTicks(-1);
+    var today = DateOnly.FromDateTime(DateTime.UtcNow);
+    var startDate = new DateOnly(today.Year, today.Month, 1);
+    var endDate = startDate.AddMonths(1).AddDays(-1);
 
     var query = new GetTotalRecurringExpensesThisMonthQuery
     {

@@ -9,7 +9,7 @@ public class Expense : BaseEntity
     public Category Category { get; private set; } = null!;
     public IReadOnlyCollection<Tag> Tags => _tags.AsReadOnly();
     public decimal Amount { get; private set; }
-    public DateTime Date { get; private set; }
+    public DateOnly Date { get; private set; }
     public string? Description { get; private set; }
     public string Currency { get; private set; } = null!;
     public bool IsRecurring { get; private set; }
@@ -20,7 +20,7 @@ public class Expense : BaseEntity
         _tags = [];
     }
 
-    public Expense(string name, Category category, decimal amount, DateTime date, string currency)
+    public Expense(string name, Category category, decimal amount, DateOnly date, string currency)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Name cannot be empty", nameof(name));
@@ -94,7 +94,7 @@ public class Expense : BaseEntity
         RecurrenceInterval = null;
     }
 
-    public Expense CreateRecurrence(DateTime newDate)
+    public Expense CreateRecurrence(DateOnly newDate)
     {
         if (!IsRecurring)
             throw new InvalidOperationException("Cannot create recurrence for non-recurring expense");
@@ -127,7 +127,7 @@ public class Expense : BaseEntity
     Name = name;
   }
 
-  internal void SetDate(DateTime date)
+  internal void SetDate(DateOnly date)
   {
     Date = date;
   }

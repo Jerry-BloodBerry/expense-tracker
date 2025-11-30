@@ -9,8 +9,8 @@ namespace Core.Features.Expenses.Queries;
 
 public class GetTopSpendingCategoryThisMonthQuery : IRequest<ErrorOr<TopCategoryResult>>
 {
-  public DateTime StartDate { get; init; }
-  public DateTime EndDate { get; init; }
+  public DateOnly StartDate { get; init; }
+  public DateOnly EndDate { get; init; }
 }
 
 public class TopCategoryResult

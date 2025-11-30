@@ -20,7 +20,8 @@ namespace Infrastructure.Config
                 .HasPrecision(18, 2);
 
             builder.Property(e => e.Date)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnType("date");
 
             builder.Property(e => e.Currency)
                 .IsRequired()

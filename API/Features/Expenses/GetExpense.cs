@@ -47,7 +47,7 @@ public class GetExpenseEndpoint : Endpoint<GetExpenseRequest, SingleResponse<Exp
       Id: result.Value.Id,
       Name: result.Value.Name,
       Amount: result.Value.Amount,
-      Date: result.Value.Date,
+      Date: result.Value.Date.ToDateTime(TimeOnly.MinValue),
       Description: result.Value.Description,
       Currency: result.Value.Currency,
       IsRecurring: result.Value.IsRecurring,

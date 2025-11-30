@@ -8,8 +8,8 @@ namespace Core.Features.Expenses.Queries;
 
 public class GetExpenseCategorySummaryQuery : IRequest<ErrorOr<ExpenseCategorySummaryResult>>
 {
-  public DateTime StartDate { get; init; }
-  public DateTime EndDate { get; init; }
+  public DateOnly StartDate { get; init; }
+  public DateOnly EndDate { get; init; }
   public string Currency { get; init; } = string.Empty;
   public List<int> TagIds { get; init; } = [];
   public List<int> CategoryIds { get; init; } = [];
@@ -18,8 +18,8 @@ public class GetExpenseCategorySummaryQuery : IRequest<ErrorOr<ExpenseCategorySu
 public class ExpenseCategorySummaryResult
 {
   public string Currency { get; set; } = string.Empty;
-  public DateTime StartDate { get; set; }
-  public DateTime EndDate { get; set; }
+  public DateOnly StartDate { get; set; }
+  public DateOnly EndDate { get; set; }
   public List<CategorySummaryDataPoint> DataPoints { get; set; } = [];
 }
 

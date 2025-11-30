@@ -9,8 +9,8 @@ namespace Core.Features.Expenses.Queries;
 
 public class GetTotalRecurringExpensesThisMonthQuery : IRequest<ErrorOr<decimal>>
 {
-  public DateTime StartDate { get; init; }
-  public DateTime EndDate { get; init; }
+  public DateOnly StartDate { get; init; }
+  public DateOnly EndDate { get; init; }
 }
 
 public class GetTotalRecurringExpensesThisMonthHandler : IRequestHandler<GetTotalRecurringExpensesThisMonthQuery, ErrorOr<decimal>>
