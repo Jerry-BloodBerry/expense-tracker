@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -21,6 +21,8 @@ import { FormatCurrencyPipe } from '../../shared/pipes/format-currency.pipe';
 import { getCategoryDisplay } from '../../shared/utils/category-display';
 import { CreateExpenseDialogComponent } from '../shared/components/create-expense-dialog/create-expense-dialog.component';
 import { LoaderComponent } from '../shared/components/loader/loader.component';
+import { MenuModule } from 'primeng/menu';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-expenses-list',
@@ -39,7 +41,9 @@ import { LoaderComponent } from '../shared/components/loader/loader.component';
     DatePipe,
     FormatCurrencyPipe,
     CreateExpenseDialogComponent,
-    LoaderComponent
+    LoaderComponent,
+    MenuModule,
+    TooltipModule
   ],
   templateUrl: './expenses-list.component.html',
   styleUrl: './expenses-list.component.scss'
@@ -47,6 +51,8 @@ import { LoaderComponent } from '../shared/components/loader/loader.component';
 export class ExpensesListComponent implements OnInit, OnDestroy {
   private expenseService = inject(ExpenseService);
   private expenseCategoriesService = inject(ExpenseCategoriesService);
+
+  @ViewChild('createExpenseDialog') createExpenseDialog?: CreateExpenseDialogComponent;
 
   protected categories = this.expenseCategoriesService.categories;
   protected getCategoryDisplay = getCategoryDisplay;
@@ -169,6 +175,10 @@ export class ExpensesListComponent implements OnInit, OnDestroy {
 
   protected onExpenseCreated() {
     this.loadExpenses();
+  }
+
+  protected duplicateExpense(expense: Expense): void {
+    this.createExpenseDialog?.showDialog(expense);
   }
 
   protected clearDateFilter() {

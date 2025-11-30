@@ -7,14 +7,16 @@
   (click)="showDialog()"
 />
 <p-dialog
-  header="Add Expense"
+  [header]="expenseTemplate() ? 'Duplicate Expense' : 'Add Expense'"
   [modal]="true"
-  [(visible)]="visible"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
   [closeOnEscape]="true"
   [dismissableMask]="true"
 >
-  <span class="p-text-secondary block mb-8">Create new expense</span>
+  <span class="p-text-secondary block mb-8">{{ expenseTemplate() ? 'Create new expense based on previous one' : 'Create new expense' }}</span>
   <app-create-expense-form
+    [expenseTemplate]="expenseTemplate()"
     (expenseCreated)="onExpenseCreated()"
     (cancelButtonClicked)="onCancelClicked()"
   />

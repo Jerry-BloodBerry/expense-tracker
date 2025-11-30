@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CardModule } from 'primeng/card';
@@ -15,6 +15,7 @@ import { LoaderComponent } from '../shared/components/loader/loader.component';
 import { FormatCurrencyPipe } from '../../shared/pipes/format-currency.pipe';
 import { getCategoryDisplay } from '../../shared/utils/category-display';
 import { EditExpenseFormComponent } from '../shared/components/edit-expense-form/edit-expense-form.component';
+import { CreateExpenseDialogComponent } from '../shared/components/create-expense-dialog/create-expense-dialog.component';
 
 @Component({
   selector: 'app-expense-details',
@@ -29,7 +30,8 @@ import { EditExpenseFormComponent } from '../shared/components/edit-expense-form
     DatePipe,
     FormatCurrencyPipe,
     LoaderComponent,
-    EditExpenseFormComponent
+    EditExpenseFormComponent,
+    CreateExpenseDialogComponent
   ],
   providers: [ConfirmationService],
   templateUrl: './expense-details.component.html',
@@ -42,6 +44,8 @@ export class ExpenseDetailsComponent implements OnInit {
   private expenseCategoriesService = inject(ExpenseCategoriesService);
   private expenseTagsService = inject(ExpenseTagsService);
   private confirmationService = inject(ConfirmationService);
+
+  @ViewChild('createExpenseDialog') createExpenseDialog?: CreateExpenseDialogComponent;
 
   protected expense = signal<Expense | null>(null);
   protected isLoading = signal<boolean>(true);
@@ -71,6 +75,13 @@ export class ExpenseDetailsComponent implements OnInit {
         this.router.navigate(['/expenses']);
       }
     });
+  }
+
+  protected reloadExpense(): void {
+    const expenseId = this.expense()?.id;
+    if (expenseId) {
+      this.loadExpense(expenseId);
+    }
   }
 
   protected getCategoryName(categoryId: number): string {
@@ -107,6 +118,12 @@ export class ExpenseDetailsComponent implements OnInit {
   protected onExpenseUpdated(updatedExpense: Expense): void {
     this.expense.set(updatedExpense);
     this.showEditDialog.set(false);
+  }
+
+  protected duplicateExpense(): void {
+    if (this.expense()) {
+      this.createExpenseDialog?.showDialog(this.expense()!);
+    }
   }
 
   protected deleteExpense(): void {

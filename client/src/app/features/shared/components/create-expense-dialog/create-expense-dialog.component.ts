@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output} from '@angular/core';
+import { Component, EventEmitter, Output, Input, signal } from '@angular/core';
 import { Dialog } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { CreateExpenseFormComponent } from "../create-expense-form/create-expense-form.component";
+import { Expense } from '../../../../shared/models/expense';
 
 @Component({
   selector: 'app-create-expense-dialog',
@@ -16,19 +17,23 @@ import { CreateExpenseFormComponent } from "../create-expense-form/create-expens
   styleUrl: './create-expense-dialog.component.scss'
 })
 export class CreateExpenseDialogComponent {
-    visible: boolean = false;
+    visible = signal<boolean>(false);
+    expenseTemplate = signal<Expense | null>(null);
     @Output() expenseCreated = new EventEmitter<void>();
 
-    showDialog() {
-      this.visible = true;
+    showDialog(templateExpense?: Expense) {
+      this.expenseTemplate.set(templateExpense || null);
+      this.visible.set(true);
     }
 
     onExpenseCreated() {
-      this.visible = false;
+      this.visible.set(false);
+      this.expenseTemplate.set(null);
       this.expenseCreated.emit();
     }
 
     onCancelClicked() {
-      this.visible = false;
+      this.visible.set(false);
+      this.expenseTemplate.set(null);
     }
 }

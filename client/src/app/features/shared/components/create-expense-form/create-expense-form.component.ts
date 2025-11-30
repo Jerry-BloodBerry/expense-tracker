@@ -52,6 +52,7 @@ export class CreateExpenseFormComponent implements OnInit, OnChanges {
 
   @Input() mode: 'create' | 'edit' = 'create';
   @Input() expenseToEdit: Expense | null = null;
+  @Input() expenseTemplate: Expense | null = null;  // For duplicating expenses
 
   @Output() expenseCreated = new EventEmitter<Expense>();
   @Output() expenseUpdated = new EventEmitter<Expense>();
@@ -83,6 +84,9 @@ export class CreateExpenseFormComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     if (this.mode === 'edit' && this.expenseToEdit) {
       this.populateFormForEdit();
+    } else if (this.expenseTemplate) {
+      // Populate from template for duplicating expenses
+      this.populateFormFromTemplate();
     } else {
       this.loadLastUsedCurrency();
     }
@@ -105,6 +109,10 @@ export class CreateExpenseFormComponent implements OnInit, OnChanges {
     if (changes['expenseToEdit'] && !changes['expenseToEdit'].firstChange && this.mode === 'edit' && this.expenseToEdit) {
       this.populateFormForEdit();
     }
+    // If expenseTemplate changes after initialization, prepopulate from template
+    if (changes['expenseTemplate'] && !changes['expenseTemplate'].firstChange && this.expenseTemplate) {
+      this.populateFormFromTemplate();
+    }
   }
 
   private populateFormForEdit(): void {
@@ -125,6 +133,27 @@ export class CreateExpenseFormComponent implements OnInit, OnChanges {
       isRecurring: this.expenseToEdit.isRecurring,
       tagIds: this.expenseToEdit.tags || [],
       recurrenceInterval: this.expenseToEdit.recurrenceInterval || null
+    });
+  }
+
+  private populateFormFromTemplate(): void {
+    if (!this.expenseTemplate) return;
+
+    const currency = CURRENCIES.find(c => c.code === this.expenseTemplate!.currency) || CURRENCIES[0];
+    const dateValue = this.expenseTemplate.date instanceof Date
+      ? this.expenseTemplate.date
+      : new Date(this.expenseTemplate.date);
+
+    this.expenseForm.patchValue({
+      title: this.expenseTemplate.name,
+      amount: this.expenseTemplate.amount,
+      category: this.expenseTemplate.category,
+      description: this.expenseTemplate.description || '',
+      currency: currency,
+      date: dateValue,
+      isRecurring: this.expenseTemplate.isRecurring,
+      tagIds: this.expenseTemplate.tags || [],
+      recurrenceInterval: this.expenseTemplate.recurrenceInterval || null
     });
   }  onSubmit() {
     if (this.expenseForm.invalid) {
