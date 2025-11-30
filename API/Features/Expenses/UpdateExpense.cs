@@ -10,7 +10,7 @@ public record UpdateExpenseRequest(
   string Name,
   int CategoryId,
   decimal Amount,
-  DateTime Date,
+  string Date,
   string? Description,
   string Currency,
   bool IsRecurring,
@@ -39,13 +39,32 @@ public class UpdateExpenseEndpoint : Endpoint<UpdateExpenseRequest, SingleRespon
 
   public override async Task HandleAsync(UpdateExpenseRequest req, CancellationToken ct)
   {
+    // Parse the date string (YYYY-MM-DD format) directly to DateOnly
+    // This avoids any timezone conversion issues
+    DateOnly dateOnly;
+    
+    if (!DateOnly.TryParse(req.Date, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dateOnly))
+    {
+      // If direct parsing fails, try parsing as DateTime first
+      if (DateTime.TryParse(req.Date, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var dateTime))
+      {
+        dateOnly = DateOnly.FromDateTime(dateTime);
+      }
+      else
+      {
+        // Return a bad request response with error details
+        ThrowError("Invalid date format. Expected YYYY-MM-DD format.");
+        return;
+      }
+    }
+
     var command = new UpdateExpenseCommand
     {
       Id = req.Id,
       Name = req.Name,
       CategoryId = req.CategoryId,
       Amount = req.Amount,
-      Date = DateOnly.FromDateTime(req.Date),
+      Date = dateOnly,
       Description = req.Description,
       Currency = req.Currency,
       IsRecurring = req.IsRecurring,

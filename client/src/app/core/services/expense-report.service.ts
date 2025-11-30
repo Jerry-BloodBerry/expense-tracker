@@ -18,10 +18,16 @@ export class ExpenseReportService {
   ): Observable<SingleResponse<ExpenseReport>> {
     let params = new HttpParams();
     if (filters.dateRange?.startDate) {
-      params = params.append('startDate', filters.dateRange.startDate.toISOString())
+      // Convert to date-only string in local timezone (YYYY-MM-DD) to avoid timezone offset issues
+      const startDate = filters.dateRange.startDate;
+      const startDateString = startDate.toLocaleDateString('en-CA'); // en-CA gives YYYY-MM-DD format
+      params = params.append('startDate', startDateString);
     }
     if (filters.dateRange?.endDate) {
-      params = params.append('endDate', filters.dateRange.endDate.toISOString())
+      // Convert to date-only string in local timezone (YYYY-MM-DD) to avoid timezone offset issues
+      const endDate = filters.dateRange.endDate;
+      const endDateString = endDate.toLocaleDateString('en-CA'); // en-CA gives YYYY-MM-DD format
+      params = params.append('endDate', endDateString);
     }
     if (filters.categories && filters.categories.length) {
       params = params.append('categoryIds', filters.categories.map(c => c.id).join(','));
@@ -41,10 +47,16 @@ export class ExpenseReportService {
   ): Observable<SingleResponse<ExpenseCategorySummary>> {
     let params = new HttpParams();
     if (filters.dateRange?.startDate) {
-      params = params.append('startDate', filters.dateRange.startDate.toISOString())
+      // Convert to date-only string in local timezone (YYYY-MM-DD) to avoid timezone offset issues
+      const startDate = filters.dateRange.startDate;
+      const startDateString = startDate.toLocaleDateString('en-CA'); // en-CA gives YYYY-MM-DD format
+      params = params.append('startDate', startDateString);
     }
     if (filters.dateRange?.endDate) {
-      params = params.append('endDate', filters.dateRange.endDate.toISOString())
+      // Convert to date-only string in local timezone (YYYY-MM-DD) to avoid timezone offset issues
+      const endDate = filters.dateRange.endDate;
+      const endDateString = endDate.toLocaleDateString('en-CA'); // en-CA gives YYYY-MM-DD format
+      params = params.append('endDate', endDateString);
     }
     if (filters.categories && filters.categories.length) {
       params = params.append('categoryIds', filters.categories.map(c => c.id).join(','));

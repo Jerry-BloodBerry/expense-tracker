@@ -53,7 +53,26 @@ export class ExpenseService {
   }
 
   createExpense(expenseData: CreateExpenseDto) {
-    return this.http.post<SingleResponse<Expense>>('/expenses', expenseData);
+    // Convert Date to ISO string format for JSON serialization
+    const dateValue = expenseData.date;
+    let dateString: string;
+
+    if (typeof dateValue === 'string') {
+      // Already a string (YYYY-MM-DD format from component)
+      dateString = dateValue;
+    } else if (dateValue instanceof Date) {
+      // Convert Date to YYYY-MM-DD string
+      dateString = dateValue.toISOString().split('T')[0];
+    } else {
+      // Fallback
+      dateString = new Date(dateValue as any).toISOString().split('T')[0];
+    }
+
+    const payload = {
+      ...expenseData,
+      date: dateString
+    };
+    return this.http.post<SingleResponse<Expense>>('/expenses', payload);
   }
 
   getExpenseById(id: number): Observable<SingleResponse<Expense>> {
@@ -61,7 +80,26 @@ export class ExpenseService {
   }
 
   updateExpense(id: number, expenseData: CreateExpenseDto): Observable<SingleResponse<Expense>> {
-    return this.http.put<SingleResponse<Expense>>(`/expenses/${id}`, expenseData);
+    // Convert Date to ISO string format for JSON serialization
+    const dateValue = expenseData.date;
+    let dateString: string;
+
+    if (typeof dateValue === 'string') {
+      // Already a string (YYYY-MM-DD format from component)
+      dateString = dateValue;
+    } else if (dateValue instanceof Date) {
+      // Convert Date to YYYY-MM-DD string
+      dateString = dateValue.toISOString().split('T')[0];
+    } else {
+      // Fallback
+      dateString = new Date(dateValue as any).toISOString().split('T')[0];
+    }
+
+    const payload = {
+      ...expenseData,
+      date: dateString
+    };
+    return this.http.put<SingleResponse<Expense>>(`/expenses/${id}`, payload);
   }
 
   deleteExpense(id: number): Observable<void> {

@@ -136,12 +136,23 @@ export class CreateExpenseFormComponent implements OnInit, OnChanges {
 
     // Map form values to the expected DTO for the backend
     const formValue = this.expenseForm.value;
+
+    // Extract date-only value to avoid timezone offset issues
+    // The datepicker returns a Date object; we need to convert it to a date string in local timezone
+    // This prevents any timezone offset when serializing to JSON
+    const dateValue = formValue.date!;
+    const year = dateValue.getFullYear();
+    const month = String(dateValue.getMonth() + 1).padStart(2, '0');
+    const day = String(dateValue.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
+
+    // Create a custom DTO with the date as a string to be converted by the service
     const expenseDto: CreateExpenseDto = {
       name: formValue.title!,
       amount: formValue.amount!,
       categoryId: formValue.category!,
       tagIds: (formValue.tagIds ?? []) as number[],
-      date: formValue.date!,
+      date: dateString as any,  // Will be handled specially by the service
       description: formValue.description || null,
       currency: formValue.currency!.code,
       isRecurring: formValue.isRecurring!,
